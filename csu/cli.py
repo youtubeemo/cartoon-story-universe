@@ -183,6 +183,14 @@ def cmd_produzieren(a) -> None:
     kasse = Kasse(float(b.get("monatsbudget_eur") or 0), monat=d.strftime("%Y-%m"))
     run = os.environ.get("GITHUB_RUN_ID") or f"lokal-{int(t_start)}"
     print(f"== {d}: {story['titel']} – Teil {teil} · {kasse.stand()}")
+    if a.geplant:  # zwei UTC-Zeitpläne (Sommer/Winter) – nur der um 05:17 deutscher Zeit produziert
+        from csu.kasse import jetzt
+        if jetzt().hour < 5:
+            print("Zeitplan: in Deutschland ist es noch vor 05:00 – dieser Lauf ist der Sommerzeit-Termin, Ende.")
+            raise SystemExit(0)
+        if any(v.get("datum") == str(d) for sl in story_slugs() for v in load_state(load_story(sl))["verlauf"]):
+            print(f"Für {d} wurde bereits eine Folge produziert – Ende ohne Kosten.")
+            raise SystemExit(0)
 
     # 1) Freigaben – fail-closed, VOR jedem kostenpflichtigen Schritt (gesperrt = Erfolg ohne Kosten)
     if not b["paid_rendering_enabled"]:
@@ -347,6 +355,33 @@ def cmd_kasse(a) -> None:
         print(f"  offen: {run} {r['eur']:.2f} € seit {r['seit']} – {'; '.join(r['zweck'])}")
 
 
+def cmd_pruefen(a) -> None:
+    """Kostenlose Betriebsprüfung: Inhalte, Kasse, Werkzeuge, Schnitt (Platzhalter) und API-Lesezugriffe."""
+    from csu.check import api_pruefung, schnitt_pruefung
+    from csu.kasse import Kasse
+    b = budget()
+    zeilen: list[tuple[bool, str]] = []
+    k = Kasse(float(b.get("monatsbudget_eur") or 0))
+    zeilen.append((k.reserviert == 0 and k.limit == 150, f"Kasse: {k.stand()}"))
+    zeilen.append((not any(b.get(x) for x in ("auto_retry",)), "Keine automatischen Wiederholungen"))
+    d = dt.date.fromisoformat(a.datum) if a.datum else dt.date.today()
+    slug = slot_for(d)
+    _, st, _, plan, _, _, est = _plan_for(slug) if episode_path(slug, load_state(load_story(slug))["naechster_teil"]).exists() \
+        else _plan_for("die-letzten-10000")
+    zeilen.append((est["eur_mit_puffer"] <= float(b["max_pro_video_eur"]),
+                   f"Referenzfolge ({plan.slug} Teil {plan.teil}): Reservierung {est['eur_mit_puffer']:.2f} € ≤ {b['max_pro_video_eur']} €"))
+    if a.schnitt:
+        qc = schnitt_pruefung()
+        zeilen.append((qc["ok"], f"Schnitt mit Platzhaltern: {qc['breite']}×{qc['hoehe']}, {qc['fps']} fps, "
+                                 f"{qc['laenge_s']} s, H.264/AAC"))
+    if a.apis:
+        zeilen += api_pruefung(plan.credits("runway"), 61000)
+    text = "## Betriebsprüfung (kostenlos)\n\n" + "\n".join(f"- {'✅' if ok else '❌'} {t}" for ok, t in zeilen)
+    _summary(text)
+    if not all(ok for ok, _ in zeilen):
+        raise SystemExit(1)
+
+
 def main(argv=None) -> None:
     p = argparse.ArgumentParser(prog="csu")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -362,6 +397,8 @@ def main(argv=None) -> None:
     s.add_argument("--out", default="ausgabe")
     s = sub.add_parser("kasse"); s.add_argument("--monat"); s.add_argument("--aufloesen", metavar="RUN")
     s.add_argument("--tatsaechlich", type=float)
+    s = sub.add_parser("pruefen"); s.add_argument("--datum"); s.add_argument("--schnitt", action="store_true")
+    s.add_argument("--apis", action="store_true")
     a = p.parse_args(argv)
     {"heute": cmd_heute, "validate": cmd_validate, "estimate": cmd_estimate, "kosten": cmd_kosten,
-     "abstimmen": cmd_abstimmen, "produzieren": cmd_produzieren, "kasse": cmd_kasse}[a.cmd](a)
+     "abstimmen": cmd_abstimmen, "produzieren": cmd_produzieren, "kasse": cmd_kasse, "pruefen": cmd_pruefen}[a.cmd](a)

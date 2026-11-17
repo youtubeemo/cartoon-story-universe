@@ -1,0 +1,30 @@
+# Kostenlose Betriebsprüfung: Inhalte, Kasse, Schnitt mit Platzhaltern, API-Lesezugriffe
+# (Runway-Guthaben, ElevenLabs-Tarif/Stimmen, Anthropic-Modell). Es wird NICHTS generiert.
+name: Betriebsprüfung (kostenlos)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruefen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Werkzeuge
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core >/dev/null
+          ffmpeg -hide_banner -filters | grep -q " ass " && echo "libass ok"
+          pip install -q -r requirements.txt && bash scripts/storyhouse_holen.sh
+      - run: python -m csu validate && python -m pytest -q tests
+      - name: Betriebsprüfung
+        env:
+          RUNWAYML_API_SECRET: ${{ secrets.RUNWAYML_API_SECRET }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: TZ=Europe/Berlin python -m csu pruefen --schnitt --apis

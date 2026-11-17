@@ -104,7 +104,7 @@ Style: Sub,DejaVu Sans,60,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,-1,0,0,0,1
 Style: SubFig,DejaVu Sans,60,&H0066E6FF,&H0066E6FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,6,3,2,90,170,430,1
 Style: Titel,DejaVu Sans,54,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,6,3,8,60,60,0,1
 Style: Frage,DejaVu Sans,64,&H0040D0FF,&H0040D0FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,7,3,5,60,60,0,1
-Style: Option,DejaVu Sans,48,&H00FFFFFF,&H00FFFFFF,&HC8402010,&HC8402010,-1,0,0,0,100,100,0,0,3,22,0,5,60,60,0,1
+Style: Option,DejaVu Sans,40,&H00FFFFFF,&H00FFFFFF,&HC8402010,&HC8402010,-1,0,0,0,100,100,0,0,3,22,0,5,60,60,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -174,15 +174,15 @@ def build_ass(story: dict, start_werte: dict, events: list[dict], total: float, 
     # Auswahlkarte
     if choice:
         t0, t1 = choice["start"], total
-        lines.append(_ev(5, t0, t1, "Frage", f"{{\\pos({W // 2},700)\\fad(300,0)\\t(0,300,\\fscx110\\fscy110)"
+        lines.append(_ev(5, t0, t1, "Frage", f"{{\\pos({W // 2},640)\\fad(300,0)\\t(0,300,\\fscx110\\fscy110)"
                                               f"\\t(300,500,\\fscx100\\fscy100)}}{wrap(choice['frage'], 22)}"))
         for i, nr in enumerate((1, 2, 3)):
             opt = choice["optionen"][nr] if nr in choice["optionen"] else choice["optionen"][str(nr)]
-            y = 900 + i * 150
+            y = 820 + i * 135
             st = t0 + 0.5 + i * 0.35
             lines.append(_ev(5, st, t1, "Option",
                              f"{{\\move(-500,{y},{W // 2},{y},0,350)\\fad(150,0)}}"
-                             f"{{\\c{GOLD}}}{nr}{{\\c&H00FFFFFF&}}  {wrap(opt['text'], 30)}"))
+                             f"{{\\c{GOLD}}}{nr}{{\\c&H00FFFFFF&}}  {wrap(opt['text'], 46)}"))
         lines.append(_ev(5, t0 + 1.8, t1, "Frage",
-                         f"{{\\pos({W // 2},1380)\\fs46\\c&H00FFFFFF&\\fad(300,0)}}Schreib 1, 2 oder 3 in die Kommentare!"))
+                         f"{{\\pos({W // 2},1250)\\fs46\\c&H00FFFFFF&\\fad(300,0)}}Schreib 1, 2 oder 3 in die Kommentare!"))
     return HEADER + "\n".join(lines) + "\n"
