@@ -1,0 +1,75 @@
+slug: station-kepler-9
+titel: "Station Kepler-9"
+thema: Science-Fiction
+wochentag: 5
+teile: 6
+logline: >
+  Technikerin Nova ist allein auf einer Raumstation am Rand des Sonnensystems – nur Wartungsroboter BOLT
+  leistet ihr Gesellschaft. Ein Meteorit schlägt ein. Die Rettung braucht 9 Tage. Der Sauerstoff nicht.
+musik: >
+  Cinematic space survival underscore, warm analog synth pads, pulsing arpeggio, deep sub bass, soft choir,
+  95 bpm, loopable, instrumental.
+
+figuren:
+  nova:
+    name: Nova
+    ref_tag: nova
+    beschreibung: "29, Technikerin, kurze lila Haare, weißer Raumanzug mit orangen Streifen, Headset"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: 29-year-old woman technician, short
+      purple undercut hair, white space suit with orange stripes, headset microphone, tool belt, brave look, plain light background.
+    voice: {voice_id: pFZP5JQG7iQjIQuC4Bku, model: eleven_v3, stability: 0.5}
+  bolt:
+    name: BOLT
+    ref_tag: bolt
+    beschreibung: "Kleiner runder Wartungsroboter, ein großes blaues Kameraauge, Greifarme, schwebt"
+    reference_prompt: >
+      2D cartoon character model sheet, front and side view: small round floating maintenance robot, white
+      and orange shell, one big glowing blue camera eye, two tiny gripper arms, antenna, cute, plain light background.
+    voice: {voice_id: bIHbv24MWmeRgasZH58o, model: eleven_v3, stability: 0.5}
+
+orte:
+  station:
+    ref_tag: station
+    reference_prompt: >
+      Ring-shaped space station orbiting a giant blue gas planet, solar panels, tiny lights, stars and nebula.
+  korridor:
+    ref_tag: korridor
+    reference_prompt: >
+      Curved white space station corridor with orange stripes, round windows showing a blue planet, panels,
+      soft lights.
+  bruecke:
+    ref_tag: bruecke
+    reference_prompt: >
+      Small command bridge of a space station, holographic displays, big curved window to space, pilot chair.
+
+hud:
+  sauerstoff: {label: Sauerstoff, typ: prozent, start: 100}
+  energie:    {label: Energie,    typ: prozent, start: 64}
+  huelle:     {label: Hülle,      typ: prozent, start: 92}
+  rettung:    {label: Rettung,    typ: tage,    start: 9, min: 0}
+anzeige: [sauerstoff, energie, huelle, rettung]
+
+handlung:
+  1: "Einschlag, Leck, Rettungsfunk – Sauerstoffsystem beschädigt."
+  2: "Außeneinsatz am Rumpf."
+  3: "BOLT entdeckt fremde Signale."
+  4: "Energiekrise – Nova muss Module abschalten."
+  5: "Das Signal antwortet."
+  6: "Ankunft der Rettung – oder von etwas anderem."
+
+teil_01_entwurf:
+  beats:
+    - "Weite Fahrt um die Station, Nova schwebt durch den Korridor, BOLT summt"
+    - "Alarm! Meteorit schlägt ein, Funken (Hülle 92 → 71)"
+    - "Leck zischt, Sauerstoff fällt (Sauerstoff 100 → 82)"
+    - "Funk: 'Rettung in 9 Tagen.' Nova rechnet – das reicht nicht"
+    - "Notstrom an (Energie 64 → 48)"
+    - "Cliffhanger: Die Luftschleuse öffnet sich von selbst"
+  entscheidung:
+    frage: "Was soll Nova tun?"
+    optionen:
+      1: {text: "Selbst rausgehen und das Leck flicken", effekte: {sauerstoff: -10, huelle: 15}}
+      2: {text: "BOLT allein schicken", effekte: {energie: -15}}
+      3: {text: "Den Korridor abriegeln", effekte: {sauerstoff: 5, energie: -5}}
+    standard: 3

@@ -1,0 +1,73 @@
+slug: die-taschenuhr-von-1923
+titel: "Die Taschenuhr von 1923"
+thema: Zeitreise
+wochentag: 3
+teile: 6
+logline: >
+  Uhrmacher-Lehrling Ben repariert eine alte Taschenuhr – und landet im Berlin von 1923, mitten in der
+  Hyperinflation. Die Uhr hat nur noch wenig Ladung, und jede Änderung an der Vergangenheit lässt seine
+  Gegenwart flackern.
+musik: >
+  Retro 1920s jazz-inspired time-travel underscore, ticking clock rhythm, muted trumpet, honky-tonk piano,
+  shimmering synth swells for time jumps, 110 bpm, loopable, instrumental.
+
+figuren:
+  ben:
+    name: Ben
+    ref_tag: ben
+    beschreibung: "23, Uhrmacher-Lehrling, dunkle Locken, Lupenbrille, Lederschürze, Kapuzenpulli"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: 23-year-old man, dark curly hair,
+      watchmaker loupe glasses on his forehead, brown leather apron over a blue hoodie, holding a glowing
+      golden pocket watch, plain light background.
+    voice: {voice_id: pNInz6obpgDQGcFmaJgB, model: eleven_v3, stability: 0.5}
+  frieda:
+    name: Frieda
+    ref_tag: frieda
+    beschreibung: "24, Zeitungsreporterin 1923, Bubikopf, Glockenhut, Trenchcoat, Notizblock"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: witty 24-year-old woman in 1920s style,
+      black bob haircut, red cloche hat, beige trench coat, notepad and pencil, plain light background.
+    voice: {voice_id: FGY2WhTYpPnrIDTdsKH5, model: eleven_v3, stability: 0.5}
+
+orte:
+  werkstatt:
+    ref_tag: werkstatt
+    reference_prompt: >
+      Small cluttered modern watchmaker workshop, hundreds of clocks on the walls, workbench with tiny tools
+      and a magnifying lamp, warm lamp light.
+  berlin1923:
+    ref_tag: berlin1923
+    reference_prompt: >
+      Busy Berlin street in 1923, old trams, horse carts, people carrying baskets full of paper money,
+      advertising columns, gas lamps, sepia-tinted sky.
+
+hud:
+  jahr:          {label: Jahr,       typ: jahr,    start: 2026}
+  ladung:        {label: Uhr-Ladung, typ: prozent, start: 100}
+  stabilitaet:   {label: Zeitlinie,  typ: prozent, start: 100}
+anzeige: [jahr, ladung, stabilitaet]
+
+handlung:
+  1: "Die Uhr springt nach 1923; Ben trifft Frieda."
+  2: "Brot kostet Milliarden – Ben lernt, wie Geld wertlos wird."
+  3: "Frieda will die Uhr für eine Zeitungsstory."
+  4: "Ben verhindert versehentlich ein Ereignis – seine Werkstatt verschwindet."
+  5: "Wettlauf um die Ladung der Uhr."
+  6: "Rücksprung – aber wohin?"
+
+teil_01_entwurf:
+  beats:
+    - "Werkstatt, Ben öffnet die Taschenuhr, Zahnräder leuchten"
+    - "Zeitstrudel – Jahr zählt rasant zurück (2026 → 1923, Ladung 100 → 70)"
+    - "Ben landet in einem Korb voller Geldscheine auf dem Markt"
+    - "Frieda: 'Wo kommst du denn her – aus der Zukunft?' Ben: 'Äh… Potsdam.'"
+    - "Ben kauft versehentlich mit einer 2-Euro-Münze – Menschenauflauf (Zeitlinie 100 → 90)"
+    - "Cliffhanger: Polizei pfeift, die Uhr flackert"
+  entscheidung:
+    frage: "Was soll Ben tun?"
+    optionen:
+      1: {text: "Sofort zurückspringen", effekte: {ladung: -30}}
+      2: {text: "Mit Frieda fliehen", effekte: {stabilitaet: -5}}
+      3: {text: "Der Polizei die Uhr zeigen", effekte: {stabilitaet: -20}}
+    standard: 2

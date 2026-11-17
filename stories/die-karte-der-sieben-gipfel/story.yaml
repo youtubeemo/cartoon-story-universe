@@ -1,0 +1,79 @@
+slug: die-karte-der-sieben-gipfel
+titel: "Die Karte der sieben Gipfel"
+thema: Abenteuer
+wochentag: 4
+teile: 6
+logline: >
+  Luftschiff-Kapitänin Rosa und Erfinder Tobi jagen die sieben Teile einer Schatzkarte über die Wolkengipfel –
+  verfolgt von der Piratin Krähe. Treibstoff, Gold und Stimmung an Bord werden knapp.
+musik: >
+  Swashbuckling sky-adventure underscore, bold brass fanfare, accordion, galloping strings, snare rolls,
+  120 bpm, loopable, instrumental.
+
+figuren:
+  rosa:
+    name: Kapitänin Rosa
+    ref_tag: rosa
+    beschreibung: "30, Kapitänin, rote Locken unter Dreispitz, Lederjacke mit Messingknöpfen, Fernrohr"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: bold 30-year-old woman captain, big red
+      curly hair under a tricorn hat, brown leather coat with brass buttons, spyglass, confident grin, plain light background.
+    voice: {voice_id: EXAVITQu4vr4xnSDxMaL, model: eleven_v3, stability: 0.5}
+  tobi:
+    name: Tobi
+    ref_tag: tobi
+    beschreibung: "25, Erfinder, klein, Schweißerbrille, Latzhose voller Werkzeug, Papagei Kiko auf der Schulter"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: short 25-year-old inventor, spiky brown
+      hair, welding goggles, overalls full of tools, a small green parrot sitting on his shoulder, plain light background.
+    voice: {voice_id: iP95p4xoKVk53GoZ742B, model: eleven_v3, stability: 0.5}
+  kraehe:
+    name: Piratin Krähe
+    ref_tag: kraehe
+    beschreibung: "45, Luftpiratin, schwarzer Federmantel, Augenklappe, silberne Haarsträhne"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: menacing 45-year-old sky pirate woman,
+      black feathered coat, eye patch, silver streak in black hair, hook-shaped pistol, plain light background.
+    voice: {voice_id: Xb7hH8MSUJpSbSDYk0k2, model: eleven_v3, stability: 0.5}
+
+orte:
+  luftschiff:
+    ref_tag: luftschiff
+    reference_prompt: >
+      Deck of a patched wooden airship named with no visible text, big striped balloon above, ropes, brass
+      steering wheel, sea of clouds and floating mountain peaks around, sunrise.
+  gipfel:
+    ref_tag: gipfel
+    reference_prompt: >
+      Floating rocky mountain peak above the clouds with ancient stone ruins, waterfalls falling into the sky,
+      glowing runes on a pillar.
+
+hud:
+  treibstoff:  {label: Treibstoff,  typ: prozent, start: 90}
+  gold:        {label: Gold,        typ: zahl,    start: 250, einheit: Münzen}
+  kartenteile: {label: Kartenteile, typ: bruch,   start: 1, max: 7}
+  moral:       {label: Crew-Moral,  typ: prozent, start: 80}
+anzeige: [treibstoff, gold, kartenteile, moral]
+
+handlung:
+  1: "Start mit Kartenteil 1; Krähe greift an."
+  2: "Gipfel der Winde – Teil 2."
+  3: "Eisgipfel, Treibstoff wird knapp."
+  4: "Verrat an Bord?"
+  5: "Bündnis mit Krähe oder Kampf."
+  6: "Der siebte Gipfel."
+
+teil_01_entwurf:
+  beats:
+    - "Sonnenaufgang über Wolken, Rosa am Steuer, Kartenteil 1 leuchtet (Kartenteile 1/7)"
+    - "Tobi tankt mit 50 Münzen Wolkenöl (Gold 250 → 200, Treibstoff 90 → 100)"
+    - "Runen zeigen Richtung Gipfel der Winde"
+    - "Schwarzes Schiff taucht auf – Krähe! Kanonenschuss, Ballon getroffen (Treibstoff 100 → 70, Moral 80 → 60)"
+    - "Cliffhanger: Krähe entert mit Enterhaken, Kiko fliegt mit dem Kartenteil davon"
+  entscheidung:
+    frage: "Was soll Rosa tun?"
+    optionen:
+      1: {text: "Kämpfen", effekte: {moral: -10}}
+      2: {text: "In die Gewitterwolke fliehen", effekte: {treibstoff: -20}}
+      3: {text: "Krähe 100 Münzen bieten", effekte: {gold: -100}}
+    standard: 2

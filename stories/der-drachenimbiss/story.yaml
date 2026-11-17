@@ -1,0 +1,79 @@
+slug: der-drachenimbiss
+titel: "Der Drachenimbiss"
+thema: Fantasy & Business
+wochentag: 6
+teile: 6
+logline: >
+  Koch Lukas eröffnet mit 2.000 € Startkapital einen Imbiss im Drachental. Seine Kundschaft: Ritter, Zwerge –
+  und Drachen, die nicht bezahlen, sondern alles anzünden. Sein einziger Helfer ist der Babydrache Glut.
+musik: >
+  Cheerful medieval fantasy comedy underscore, lute, bouncy bassoon, fiddle, tambourine, playful glockenspiel,
+  115 bpm, loopable, instrumental.
+
+figuren:
+  lukas:
+    name: Lukas
+    ref_tag: lukas
+    beschreibung: "24, Koch, kräftig, blonder Dutt, weiße Kochjacke mit Brandflecken, Pfanne"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: stocky 24-year-old cook, blond man bun,
+      short beard, white chef jacket with scorch marks, frying pan in hand, cheerful, plain light background.
+    voice: {voice_id: cjVigY5qzO86Huf0OWal, model: eleven_v3, stability: 0.5}
+  glut:
+    name: Glut
+    ref_tag: glut
+    beschreibung: "Babydrache, katzengroß, orange Schuppen, winzige Flügel, niest Feuer"
+    reference_prompt: >
+      2D cartoon character model sheet, front and side view: cat-sized baby dragon, bright orange scales,
+      tiny bat wings, big golden eyes, round belly, small smoke puff from nostrils, plain light background.
+    voice: {voice_id: SAz9YHcvj6GT2YYXdXww, model: eleven_v3, stability: 0.5}
+  brunhild:
+    name: Ritterin Brunhild
+    ref_tag: brunhild
+    beschreibung: "Stammkundin, riesige Rüstung, Lebensmittelkritikerin des Tals"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: huge armored female knight, dented
+      silver armour, red plume on helmet, visor up showing a stern face, holding a notebook, plain light background.
+    voice: {voice_id: 21m00Tcm4TlvDq8ikWAM, model: eleven_v3, stability: 0.5}
+
+orte:
+  imbiss:
+    ref_tag: imbiss
+    reference_prompt: >
+      Small wooden food stall with a striped awning in a fantasy valley, cauldron and grill, hand-painted menu
+      board without readable text, mushroom houses and a castle in the background.
+  drachental:
+    ref_tag: drachental
+    reference_prompt: >
+      Wide fantasy valley with green hills, a winding river, dragon caves in cliffs, dragons flying in the sky.
+
+hud:
+  geld:   {label: Geld,       typ: geld,    start: 2000, min: 0}
+  ruf:    {label: Ruf,        typ: sterne,  start: 1, min: 0, max: 5}
+  kunden: {label: Kunden,     typ: zahl,    start: 0}
+  hunger: {label: Drachenhunger, typ: prozent, start: 40, gut: runter}
+anzeige: [geld, ruf, kunden, hunger]
+
+handlung:
+  1: "Eröffnung, erste Kunden, ein riesiger Drache landet."
+  2: "Kritik von Ritterin Brunhild."
+  3: "Konkurrenz: der Goldene Kessel."
+  4: "Glut lernt kochen."
+  5: "Das große Drachenfest."
+  6: "Finale: fünf Sterne?"
+
+teil_01_entwurf:
+  beats:
+    - "Lukas zahlt Stand und Zutaten (Geld 2.000 → 1.400)"
+    - "Glut niest – Grill brennt, Würstchen perfekt"
+    - "Zwerge stehen Schlange (Kunden 0 → 12, Geld 1.400 → 1.640)"
+    - "Brunhild probiert, schreibt in ihr Buch (Ruf 1 → 2)"
+    - "Boden bebt, Drachenhunger steigt (40 → 90)"
+    - "Cliffhanger: Ein riesiger roter Drache landet und reißt das Maul auf"
+  entscheidung:
+    frage: "Was soll Lukas tun?"
+    optionen:
+      1: {text: "Alles Essen verschenken", effekte: {hunger: -60, geld: -300}}
+      2: {text: "Glut verhandeln lassen", effekte: {hunger: -20}}
+      3: {text: "Rennen!", effekte: {ruf: -1}}
+    standard: 2

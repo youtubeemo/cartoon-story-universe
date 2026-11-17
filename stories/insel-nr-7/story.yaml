@@ -1,0 +1,79 @@
+slug: insel-nr-7
+titel: "Insel Nr. 7"
+thema: Überleben
+wochentag: 1
+teile: 6
+logline: >
+  Wasserflugzeug-Pilotin Mila muss mit Corgi Pixel auf einer winzigen Tropeninsel notlanden. Das Funkgerät
+  ist kaputt, das Wasser knapp – und nachts leuchtet etwas im Dschungel.
+musik: >
+  Adventurous tropical survival underscore, marimba, low taiko drums, airy flutes, tense string swells,
+  90 bpm, loopable, instrumental.
+
+figuren:
+  mila:
+    name: Mila
+    ref_tag: mila
+    beschreibung: "26, Pilotin, kurze blonde Haare, Fliegerbrille auf der Stirn, olivgrüner Overall, Pflaster an der Wange"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: athletic 26-year-old woman, short messy
+      blonde hair, aviator goggles pushed up on her forehead, olive-green pilot jumpsuit with rolled sleeves,
+      small bandage on her left cheek, determined look, plain light background.
+    voice: {voice_id: XrExE9yKIg1WjnnlVkGX, model: eleven_v3, stability: 0.5}
+  pixel:
+    name: Pixel
+    ref_tag: pixel
+    beschreibung: "Corgi, orange-weiß, rotes Halstuch, sehr mutig, spricht nicht (Bellen per Soundeffekt)"
+    reference_prompt: >
+      2D cartoon character model sheet, front and side view: chubby orange-and-white corgi dog with big ears,
+      short legs, red neckerchief, very expressive happy face, plain light background.
+
+orte:
+  strand:
+    ref_tag: strand
+    reference_prompt: >
+      Tiny tropical island beach, turquoise water, white sand, a crashed small red-and-white seaplane tilted
+      in the shallows, palm trees, dense jungle behind, dramatic clouds.
+  dschungel:
+    ref_tag: dschungel
+    reference_prompt: >
+      Dense lush tropical jungle with giant leaves, hanging vines, mossy rocks, beams of light through the
+      canopy, a small waterfall in the distance.
+  lager:
+    ref_tag: lager
+    reference_prompt: >
+      Small survival camp at dusk on a beach: driftwood shelter with palm-leaf roof, campfire ring of stones,
+      plane parts used as tools, orange sky.
+
+hud:
+  wasser:     {label: Wasser,     typ: prozent, start: 75}
+  essen:      {label: Essen,      typ: prozent, start: 60}
+  gesundheit: {label: Gesundheit, typ: prozent, start: 80}
+  energie:    {label: Energie,    typ: prozent, start: 70}
+  tag:        {label: Tag,        typ: zahl,    start: 1, min: 1}
+  inventar:   {label: Inventar,   typ: inventar, start: [Taschenmesser, Leuchtpistole (1 Schuss)]}
+anzeige: [wasser, essen, gesundheit, energie, tag, inventar]
+
+handlung:
+  1: "Notlandung, Bestandsaufnahme, erster Abend – ein Licht im Dschungel."
+  2: "Wassersuche; das Licht stammt von einer alten Forschungsstation."
+  3: "Sturm zerstört das Lager; Pixel findet einen Bunker."
+  4: "Im Bunker: Funkgerät ohne Strom, Hinweise auf eine verschwundene Crew."
+  5: "Ein Schiff am Horizont – nur ein Leuchtschuss."
+  6: "Finale: Rettung oder Rätsel der Insel gelöst."
+
+teil_01_entwurf:
+  beats:
+    - "Motor stottert, Sturzflug, Wasserlandung – Spritzer bis zur Kamera (Gesundheit 80 → 70)"
+    - "Mila und Pixel waten an Land, Wrack qualmt; Inventar: Taschenmesser, Leuchtpistole"
+    - "Funkgerät knistert und stirbt; Wasserflasche halb leer (Wasser 75 → 60)"
+    - "Pixel buddelt Kokosnüsse aus (Inventar + Kokosnuss ×2, Essen 60 → 70)"
+    - "Sonnenuntergang, Feuer mit Funken aus dem Wrack (Energie 70 → 50)"
+    - "Cliffhanger: Im Dschungel blinkt ein grünes Licht – dreimal kurz, dreimal lang"
+  entscheidung:
+    frage: "Was soll Mila tun?"
+    optionen:
+      1: {text: "Sofort zum Licht – mit Pixel", effekte: {energie: -20}}
+      2: {text: "Bis morgen warten und Wasser sammeln", effekte: {wasser: 15, tag: 1}}
+      3: {text: "Den Leuchtschuss abfeuern", effekte: {inventar: ["-Leuchtpistole (1 Schuss)"]}}
+    standard: 2

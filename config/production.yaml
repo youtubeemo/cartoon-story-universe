@@ -1,0 +1,53 @@
+# =====================================================================
+#  CARTOON STORY UNIVERSE – Produktionsplan
+#  Mo–So je eine Geschichte. Woche 1 = Teil 1 aller Geschichten, Woche 2 = Teil 2 …
+#  Ist eine Geschichte beendet, übernimmt die nächste aus „warteschlange“ ihren Wochentag.
+# =====================================================================
+
+start_datum: null            # wird bei der Freigabe gesetzt, z. B. "2026-11-23" (ein Montag)
+zeitzone: Europe/Berlin
+
+wochenplan:                  # 0 = Montag … 6 = Sonntag
+  0: die-letzten-10000
+  1: insel-nr-7
+  2: das-haus-am-nebelsee
+  3: die-taschenuhr-von-1923
+  4: die-karte-der-sieben-gipfel
+  5: station-kepler-9
+  6: der-drachenimbiss
+
+warteschlange: []            # neue Geschichten nach einem Finale (Slugs aus stories/)
+
+video:
+  breite: 1080
+  hoehe: 1920
+  fps: 30
+  ziel_sekunden: [60, 90]
+  generierung_ratio: "720:1280"   # Runway rendert 720p, FFmpeg skaliert auf 1080×1920 (Lanczos)
+  crf: 20
+  preset: veryfast
+  audio_bitrate: 192k
+  lautheit_lufs: -14.0
+
+stil:                         # einheitlicher Look – wird an JEDEN Bild-Prompt angehängt
+  global: >
+    High-quality 2D hand-drawn cartoon animation still, feature-film 2D look, clean bold dark-brown ink
+    outlines, cel shading with soft gradient shadows, painterly richly detailed backgrounds, warm saturated
+    palette with teal accents, expressive characters with large eyes and readable silhouettes, dynamic
+    composition, vertical 9:16, no text, no letters, no subtitles, no watermark.
+  bewegung: >
+    Smooth 2D cartoon character animation with squash and stretch, lively secondary motion (hair, cloth),
+    consistent character design, dynamic camera move.
+
+sprecher:                     # durchgehender deutscher Erzähler (ElevenLabs, Premade-Stimme „George“)
+  voice_id: JBFqnCBsd6RMkjVDRZzb
+  model: eleven_v3
+  stability: 0.5
+
+drehbuch_modell: claude-sonnet-5-5   # Claude-API, nur wenn drehbuch_api_aktiv
+
+profil: test                  # test = gen4_image_turbo + gen4_turbo · final = gen4_image + gen4.5
+
+veroeffentlichung:
+  tiktok: false               # nur nach gesonderter Freigabe
+  youtube: false

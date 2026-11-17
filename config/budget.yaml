@@ -1,0 +1,31 @@
+# =====================================================================
+#  VERBINDLICHE BUDGETKONTROLLE – CARTOON STORY UNIVERSE
+#  Änderungen nur per Commit/PR mit ausdrücklicher Freigabe.
+# =====================================================================
+
+# Hauptschalter: Solange false, wird KEIN kostenpflichtiger API-Aufruf ausgeführt
+# (Runway, ElevenLabs, Claude-API) – egal, was im Workflow eingegeben wird.
+paid_rendering_enabled: false
+
+# Täglicher automatischer Lauf (GitHub-Cron). Zusätzlich muss der Cron-Block
+# in .github/workflows/produktion.yml einkommentiert werden.
+taeglich_aktiv: false
+
+# Drehbuch per Claude-API erzeugen (sonst: Folgen liegen fertig im Repo).
+drehbuch_api_aktiv: false
+
+monatsbudget_eur: 0          # bei Freigabe setzen (siehe KOSTEN.md), z. B. 220
+max_pro_video_eur: 12.00     # harte Grenze je Video inkl. Puffer
+safety_margin: 0.25          # +25 % auf jede Schätzung
+eur_per_usd: 1.00            # bewusst konservativ
+vat_rate: 0.19
+approval_phrase: "Ich gebe die Kosten für dieses Video frei"
+
+# Keine automatischen kostenpflichtigen Wiederholungen: schlägt ein Auftrag fehl,
+# bricht der Lauf ab. Bereits bezahlte Ergebnisse bleiben im Cache und werden beim
+# nächsten (manuell gestarteten) Lauf kostenlos wiederverwendet.
+auto_retry: false
+
+elevenlabs:
+  require_commercial_license: true   # Free-Tarif wird verweigert
+  music_license_confirmed: false     # Musik je Geschichte EINMAL erzeugen und wiederverwenden

@@ -1,0 +1,71 @@
+slug: die-letzten-10000
+titel: "Die letzten 10.000 €"
+thema: Geld
+wochentag: 0
+teile: 6
+logline: >
+  Fahrradkurier Jonas erbt von Oma Edith 10.000 € – und ihre Bäckerei mit 18.000 € Schulden. In 30 Tagen
+  pfändet die Bank, und Immobilienhai Grell will den Laden für einen Spottpreis. Jede Ausgabe zählt.
+
+figuren:
+  jonas:
+    name: Jonas
+    ref_tag: jonas
+    beschreibung: "21, Fahrradkurier, schlaksig, rote Locken, Sommersprossen, orange Kurierjacke, grüner Rucksack"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: lanky 21-year-old man, messy red curly
+      hair, freckles, big hopeful green eyes, bright orange courier jacket, mint-green messenger backpack,
+      grey cargo pants, white sneakers, plain light background.
+    voice: {voice_id: TX3LPaxmHKxFdv7VOQHJ, model: eleven_v3, stability: 0.5}
+  aylin:
+    name: Aylin
+    ref_tag: aylin
+    beschreibung: "22, Bäckerin bei Oma Edith, schwarzer Zopf, mehlbestäubte blaue Schürze, energisch"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: energetic 22-year-old woman, long black
+      braid, warm brown eyes, flour-dusted navy-blue apron over a white shirt, sleeves rolled up, confident
+      smile, plain light background.
+    voice: {voice_id: cgSgspJ2msm6clMCkdW9, model: eleven_v3, stability: 0.5}
+  grell:
+    name: Herr Grell
+    ref_tag: grell
+    beschreibung: "55, Immobilienhai, glatzköpfig, spitzer Schnurrbart, lila Anzug, goldener Füller"
+    reference_prompt: >
+      2D cartoon character model sheet, front and three-quarter view: tall thin 55-year-old man, bald head,
+      thin pointed black moustache, narrow eyes, shiny purple three-piece suit, gold fountain pen in hand,
+      smug grin, plain light background.
+    voice: {voice_id: N2lVS1w4EtoT3dr4eOWO, model: eleven_v3, stability: 0.5}
+
+orte:
+  backstube:
+    ref_tag: backstube
+    reference_prompt: >
+      Cozy old corner bakery interior, wooden shelves with bread, glass counter, flour sacks, big brass oven,
+      warm morning light through a shop window with painted lettering shapes, slightly shabby.
+  strasse:
+    ref_tag: strasse
+    reference_prompt: >
+      Colourful old-town street with cobblestones, small shops, a corner bakery with a faded awning,
+      bicycles, autumn trees, golden hour.
+  bank:
+    ref_tag: bank
+    reference_prompt: >
+      Cold modern bank office, grey desk, glass walls, big wall clock, neat stacks of folders, blue light.
+
+musik: >                       # einmal erzeugen (assets/music/<slug>.mp3), dann in jeder Folge wiederverwenden
+  Playful tense heist-comedy underscore, pizzicato strings, ticking clock percussion, upright bass,
+  light brass stabs, 100 bpm, loopable, instrumental.
+
+hud:                           # Statusanzeigen – Startwerte vor Teil 1
+  geld:     {label: Geld,     typ: geld,  start: 0,     min: 0}
+  schulden: {label: Schulden, typ: geld,  start: 18000, min: 0, gut: runter}
+  tage:     {label: Frist,    typ: tage,  start: 30,    min: 0}
+anzeige: [geld, schulden, tage]
+
+handlung:                      # Bogen über 6 Teile (Details entstehen je nach Zuschauerwahl)
+  1: "Erbe, Schuldenbrief, Grells Angebot – erste Entscheidung über das Geld."
+  2: "Erste Einnahmen oder Verluste je nach Wahl; Aylin entdeckt Omas geheimes Rezeptbuch."
+  3: "Grell sabotiert den Laden (Lieferant springt ab); Stadtfest als Chance."
+  4: "Das Rezeptbuch ist mehr wert als gedacht – ein Sammler bietet viel Geld."
+  5: "Letzte 5 Tage, alles hängt am Stadtfest-Wettbewerb."
+  6: "Finale in der Bank – reicht das Geld?"
