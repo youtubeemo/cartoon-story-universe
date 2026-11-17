@@ -2,17 +2,26 @@
   "version": 2,
   "monate": {
     "2026-11": {
-      "gebucht_eur": 0.0,
+      "gebucht_eur": 0.0812,
       "reservierungen": {
         "44202943859": {
-          "eur": 0.19,
-          "seit": "2026-11-18T00:51:39+01:00",
+          "eur": 6.16,
+          "seit": "2026-11-18T00:52:20+01:00",
           "zweck": [
-            "Drehbuch (Claude-API, Höchstwert): 0.19 €"
+            "Folge das-haus-am-nebelsee Teil 1 (Runway, Höchstwert): 6.16 €"
           ]
         }
       },
-      "posten": [],
+      "posten": [
+        {
+          "zeit": "2026-11-18T00:52:19+01:00",
+          "run": "44202943859",
+          "anbieter": "anthropic",
+          "eur": 0.08,
+          "credits": null,
+          "notiz": "6149/5592 Tokens"
+        }
+      ],
       "limit_eur": 150.0
     }
   }
