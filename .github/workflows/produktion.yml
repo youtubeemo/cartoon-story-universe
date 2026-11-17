@@ -78,6 +78,7 @@ jobs:
           GEPLANT: ${{ github.event_name == 'schedule' && '--geplant' || '' }}
           CSU_GIT_SYNC: "1"
         run: |
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
           TZ=Europe/Berlin python -m csu produzieren --out ausgabe $GEPLANT \
             --bestaetigung "$BESTAETIGUNG" --datum "${DATUM:-$(TZ=Europe/Berlin date +%F)}" \
             --youtube-video-id "$YT_ID" --tiktok-stimmen "$TT"

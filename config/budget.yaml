@@ -5,13 +5,13 @@
 
 # Hauptschalter: Solange false, wird KEIN kostenpflichtiger API-Aufruf ausgeführt
 # (Runway, ElevenLabs, Claude-API). Der tägliche Lauf prüft dann nur kostenlos und endet.
-paid_rendering_enabled: false
+paid_rendering_enabled: true
 
 # Täglicher automatischer Lauf darf Geld ausgeben (der Zeitplan selbst ist aktiv, prüft aber nur).
 taeglich_aktiv: false
 
 # Drehbuch täglich per Claude-API erzeugen (sonst nur vorhandene Drehbücher aus dem Repo).
-drehbuch_api_aktiv: false
+drehbuch_api_aktiv: true
 
 # Zusätzliche Ausgaben pro Kalendermonat (Europe/Berlin) – Abo-Gebühren zählen NICHT dazu.
 monatsbudget_eur: 150
