@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "monate": {
+    "2026-11": {
+      "gebucht_eur": 0.0,
+      "reservierungen": {
+        "44202943859": {
+          "eur": 0.19,
+          "seit": "2026-11-18T00:51:39+01:00",
+          "zweck": [
+            "Drehbuch (Claude-API, Höchstwert): 0.19 €"
+          ]
+        }
+      },
+      "posten": [],
+      "limit_eur": 150.0
+    }
+  }
+}
