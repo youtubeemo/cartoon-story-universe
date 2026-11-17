@@ -1,10 +1,12 @@
 # =====================================================================
 #  Tagesvideo produzieren – KOSTENPFLICHTIG (Runway, ElevenLabs, optional Claude-API)
 #
-#  Läuft nur, wenn config/budget.yaml paid_rendering_enabled: true ist UND
-#    * manuell: die Bestätigungsphrase eingegeben wird, oder
-#    * täglich: taeglich_aktiv: true gesetzt UND der schedule-Block unten einkommentiert ist.
-#  Ergebnis: MP4 als GitHub-Release-Datei (direkter Link, kein ZIP) + Issue mit Link (Push aufs iPhone).
+#  Der Zeitplan ist aktiv. Geld wird nur ausgegeben, wenn config/budget.yaml paid_rendering_enabled: true ist UND
+#    * täglich: taeglich_aktiv: true, oder
+#    * manuell: die Bestätigungsphrase eingegeben wird.
+#  Sonst endet der Lauf nach kostenlosen Prüfungen erfolgreich („keine Produktion, 0 €“).
+#  Zentrale Kasse (csu/kasse.py): Monatslimit, Reservierung vor Beginn, Prüfung vor jedem Aufruf, Protokoll.
+#  Ergebnis: MP4 als GitHub-Release-Datei (direkter Link, kein ZIP), Produktionsbericht, Issue mit Link.
 # =====================================================================
 name: Tagesvideo produzieren
 
@@ -13,7 +15,7 @@ on:
     inputs:
       bestaetigung:
         description: "Bestätigungsphrase (config/budget.yaml → approval_phrase)"
-        required: true
+        required: false
         type: string
       datum:
         description: "Datum JJJJ-MM-TT (leer = heute)"
@@ -27,9 +29,8 @@ on:
         description: "TikTok-Stimmen der Vorfolge, z. B. 1=34,2=12,3=8 (optional)"
         required: false
         type: string
-  # ERST NACH BUDGETFREIGABE einkommentieren (zusätzlich taeglich_aktiv: true in config/budget.yaml):
-  # schedule:
-  #   - cron: "17 4 * * *"      # täglich 05:17 Uhr Berlin (Winterzeit) / 06:17 (Sommerzeit)
+  schedule:
+    - cron: "17 4 * * *"        # täglich 05:17 Uhr Berlin (Winterzeit) / 06:17 (Sommerzeit)
 
 permissions:
   contents: write     # Stand + Referenzbilder sichern, Release anlegen
@@ -74,6 +75,7 @@ jobs:
           YT_ID: ${{ inputs.youtube_video_id }}
           TT: ${{ inputs.tiktok_stimmen }}
           GEPLANT: ${{ github.event_name == 'schedule' && '--geplant' || '' }}
+          CSU_GIT_SYNC: "1"
         run: |
           TZ=Europe/Berlin python -m csu produzieren --out ausgabe $GEPLANT \
             --bestaetigung "$BESTAETIGUNG" --datum "${DATUM:-$(TZ=Europe/Berlin date +%F)}" \
@@ -84,26 +86,26 @@ jobs:
         run: |
           git config user.name "csu-bot"
           git config user.email "csu-bot@users.noreply.github.com"
-          git add state assets stories
+          git add state assets stories berichte 2>/dev/null || git add state assets stories
           git diff --cached --quiet || git commit -q -m "Produktion $(date +%F): Stand und Kosten"
           git push -q || echo "Push fehlgeschlagen – Stand liegt im Log"
 
       - name: MP4 als Release veröffentlichen (direkter Download)
         id: release
-        if: success()
+        if: success() && hashFiles('ausgabe/release.json') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG=$(jq -r .tag ausgabe/release.json); DATEI=$(jq -r .datei ausgabe/release.json)
           NAME=$(jq -r .dateiname ausgabe/release.json); TITEL=$(jq -r .titel ausgabe/release.json)
-          jq -r .notiz ausgabe/release.json > notiz.txt
+          cp "$(jq -r .bericht ausgabe/release.json)" notiz.txt
           gh release create "$TAG" "$DATEI" --title "$TITEL" --notes-file notiz.txt
           URL="https://github.com/${{ github.repository }}/releases/download/$TAG/$NAME"
           echo "url=$URL" >> "$GITHUB_OUTPUT"; echo "titel=$TITEL" >> "$GITHUB_OUTPUT"
 
       - name: Optional – zusätzlicher Link ohne GitHub-Login (Cloudflare R2, 7 Tage gültig)
         id: r2
-        if: success() && env.R2_BUCKET != ''
+        if: success() && env.R2_BUCKET != '' && steps.release.outputs.url != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -115,13 +117,13 @@ jobs:
           echo "url=$(aws s3 presign "s3://$R2_BUCKET/$NAME" --endpoint-url "$R2_ENDPOINT" --expires-in 604800)" >> "$GITHUB_OUTPUT"
 
       - name: Benachrichtigung (GitHub-App aufs iPhone)
-        if: success()
+        if: success() && steps.release.outputs.url != ''
         env:
           GH_TOKEN: ${{ github.token }}
           URL: ${{ steps.release.outputs.url }}
           R2: ${{ steps.r2.outputs.url }}
           TITEL: ${{ steps.release.outputs.titel }}
         run: |
-          BODY="**Direkter MP4-Download:** $URL"
-          [ -n "$R2" ] && BODY="$BODY"$'\n\n'"**Ohne Login (7 Tage):** $R2"
+          BODY="$(cat notiz.txt)"
+          [ -n "$R2" ] && BODY="**Ohne Login (7 Tage):** $R2"$'\n\n'"$BODY"
           gh issue create --title "🎬 $TITEL" --body "$BODY" || true

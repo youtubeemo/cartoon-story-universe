@@ -1,31 +1,42 @@
 # =====================================================================
 #  VERBINDLICHE BUDGETKONTROLLE – CARTOON STORY UNIVERSE
-#  Änderungen nur per Commit/PR mit ausdrücklicher Freigabe.
+#  Änderungen nur per Commit mit ausdrücklicher Freigabe.
 # =====================================================================
 
 # Hauptschalter: Solange false, wird KEIN kostenpflichtiger API-Aufruf ausgeführt
-# (Runway, ElevenLabs, Claude-API) – egal, was im Workflow eingegeben wird.
+# (Runway, ElevenLabs, Claude-API). Der tägliche Lauf prüft dann nur kostenlos und endet.
 paid_rendering_enabled: false
 
-# Täglicher automatischer Lauf (GitHub-Cron). Zusätzlich muss der Cron-Block
-# in .github/workflows/produktion.yml einkommentiert werden.
+# Täglicher automatischer Lauf darf Geld ausgeben (der Zeitplan selbst ist aktiv, prüft aber nur).
 taeglich_aktiv: false
 
-# Drehbuch per Claude-API erzeugen (sonst: Folgen liegen fertig im Repo).
+# Drehbuch täglich per Claude-API erzeugen (sonst nur vorhandene Drehbücher aus dem Repo).
 drehbuch_api_aktiv: false
 
-monatsbudget_eur: 0          # bei Freigabe setzen (siehe KOSTEN.md), z. B. 220
-max_pro_video_eur: 12.00     # harte Grenze je Video inkl. Puffer
-safety_margin: 0.25          # +25 % auf jede Schätzung
-eur_per_usd: 1.00            # bewusst konservativ
-vat_rate: 0.19
+# Zusätzliche Ausgaben pro Kalendermonat (Europe/Berlin) – Abo-Gebühren zählen NICHT dazu.
+monatsbudget_eur: 150
+max_pro_video_eur: 12.00     # harte Grenze je Folge inkl. Aufschlag
+safety_margin: 0.25          # Reservierung = Schätzung × 1,25
+eur_per_usd: 1.00            # bewusst ungünstig (echter Kurs liegt darunter) → deckt Kursschwankungen
+vat_rate: 0.19               # USt. wird immer eingerechnet
 approval_phrase: "Ich gebe die Kosten für dieses Video frei"
+min_stimmen: 5
 
-# Keine automatischen kostenpflichtigen Wiederholungen: schlägt ein Auftrag fehl,
-# bricht der Lauf ab. Bereits bezahlte Ergebnisse bleiben im Cache und werden beim
-# nächsten (manuell gestarteten) Lauf kostenlos wiederverwendet.
+# Keine automatischen Wiederholungen: schlägt ein Auftrag fehl, endet der Lauf. Bezahlte Ergebnisse
+# bleiben im Cache und werden beim nächsten Lauf kostenlos wiederverwendet.
 auto_retry: false
+
+# Automatische Aufladungen bleiben überall AUS (siehe KOSTEN.md → „Aufladungen“).
+# Runway: Guthaben wird vor jedem Lauf kostenlos abgefragt; reicht es nicht → Stopp, kein Nachkauf.
+runway_min_restguthaben_credits: 0
 
 elevenlabs:
   require_commercial_license: true   # Free-Tarif wird verweigert
-  music_license_confirmed: false     # Musik je Geschichte EINMAL erzeugen und wiederverwenden
+  music_license_confirmed: true      # Creator-Tarif: kommerzielle Nutzung inkl. Musik; Musik je Geschichte nur EINMAL
+
+anthropic:                           # Drehbuch (Claude Sonnet 5.5), Preise USD je 1 Mio. Tokens, Stand 11/2026
+  modell: claude-sonnet-5-5
+  usd_input_mtok: 2.00
+  usd_output_mtok: 10.00
+  max_input_tokens: 40000            # Reservierung rechnet mit diesen Höchstwerten
+  max_output_tokens: 8000

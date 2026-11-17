@@ -6,6 +6,7 @@
   kosten       Hochrechnung pro Video und Monat                         (kostenlos)
   abstimmen    Zuschauerwahl auswerten und speichern                    (kostenlos)
   produzieren  Tageslauf: Wahl → Drehbuch → Prüfung → Render → MP4      (KOSTENPFLICHTIG, nur nach Freigabe)
+  kasse        Monatsbudget, Reservierungen, Nachbuchung                (kostenlos)
 """
 from __future__ import annotations
 
@@ -22,7 +23,6 @@ from csu.state import effects_to_events, load_state, save_state
 from csu.validate import validate_episode, validate_story
 
 SLOT_FILE = STATE / "wochenplan.json"
-LEDGER = STATE / "kosten.json"
 
 
 # ---------------------------------------------------------------- Plan
@@ -149,75 +149,130 @@ def resolve_vote(story, st, yt_id, manual, decide, fetch, parse_manual, tally) -
 
 
 # ---------------------------------------------------------------- Produktion
+def _summary(text: str) -> None:
+    """Kurzbericht in die GitHub-Actions-Zusammenfassung (kostenlos)."""
+    print(text)
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if path:
+        with open(path, "a", encoding="utf-8") as fh:
+            fh.write(text + "\n")
+
+
+def _gesperrt(grund: str, d, story, teil, kasse) -> None:
+    _summary(f"## ⏸ Keine Produktion am {d}\n\n{story['titel']} – Teil {teil} wäre dran.\n\n"
+             f"**Grund:** {grund}\n\n{kasse.stand()}\n\nEs sind keine Kosten entstanden.")
+    raise SystemExit(0)
+
+
 def cmd_produzieren(a) -> None:
+    import time
+    from csu.kasse import BudgetStopp, Kasse, git_sync
+    from csu.common import storyhouse_import
     from csu.voting import decide, fetch_youtube_comments, parse_manual, tally
+    storyhouse_import()
+    from storyhouse.budget import ApprovalError, BudgetError
+    from storyhouse.elevenlabs import ElevenLabsError
+    from storyhouse.runway import RunwayError
+    t_start = time.time()
     b = budget()
     d = dt.date.fromisoformat(a.datum) if a.datum else dt.date.today()
     slug = slot_for(d)
     story = load_story(slug)
     st = load_state(story)
     teil = st["naechster_teil"]
-    print(f"== {d}: {story['titel']} – Teil {teil}")
+    kasse = Kasse(float(b.get("monatsbudget_eur") or 0), monat=d.strftime("%Y-%m"))
+    run = os.environ.get("GITHUB_RUN_ID") or f"lokal-{int(t_start)}"
+    print(f"== {d}: {story['titel']} – Teil {teil} · {kasse.stand()}")
 
-    # Freigaben (fail-closed) – VOR jedem kostenpflichtigen Schritt
+    # 1) Freigaben – fail-closed, VOR jedem kostenpflichtigen Schritt (gesperrt = Erfolg ohne Kosten)
     if not b["paid_rendering_enabled"]:
-        raise SystemExit("Gesperrt: paid_rendering_enabled ist false (config/budget.yaml). Keine Kosten entstanden.")
+        _gesperrt("Kostenpflichtige Produktion ist noch nicht freigegeben (paid_rendering_enabled: false).",
+                  d, story, teil, kasse)
     if a.geplant and not b["taeglich_aktiv"]:
-        raise SystemExit("Gesperrt: taeglich_aktiv ist false. Keine Kosten entstanden.")
+        _gesperrt("Tägliche Produktion ist noch nicht freigegeben (taeglich_aktiv: false).", d, story, teil, kasse)
     if not a.geplant and a.bestaetigung.strip() != b["approval_phrase"]:
         raise SystemExit("Bestätigungsphrase fehlt oder falsch. Keine Kosten entstanden.")
+    if kasse.reserviert > 0:
+        raise SystemExit("Es gibt eine offene Reservierung eines früheren Laufs – erst prüfen und mit "
+                         "`python -m csu kasse --aufloesen RUN --tatsaechlich EUR` bereinigen. Keine Kosten entstanden.")
 
-    print(resolve_vote(story, st, a.youtube_video_id, a.tiktok_stimmen, decide, fetch_youtube_comments,
-                       parse_manual, tally))
-    if not episode_path(slug, teil).exists():
-        if not b["drehbuch_api_aktiv"]:
-            raise SystemExit(f"Drehbuch Teil {teil} fehlt und drehbuch_api_aktiv ist false.")
-        from csu.script import generate
-        generate(story, st)
-    ep = load_episode(slug, teil)
-    errs, warns, info = validate_episode(story, ep, st, tuple(production()["video"]["ziel_sekunden"]))
-    for w in warns:
-        print("Hinweis:", w)
-    if errs:
-        save_state(st)  # Abstimmungsergebnis behalten
-        raise SystemExit("Drehbuch ungültig – Abbruch vor Runway/ElevenLabs:\n  " + "\n  ".join(errs))
+    # 2) Zuschauerwahl der Vorfolge (kostenlos)
+    wahl_text = resolve_vote(story, st, a.youtube_video_id, a.tiktok_stimmen, decide, fetch_youtube_comments,
+                             parse_manual, tally)
+    print(wahl_text)
+    save_state(st)
 
-    _, _, _, plan, pricing, cfg, est = _plan_for(slug)
-    monat = d.strftime("%Y-%m")
-    ledger = json.loads(LEDGER.read_text()) if LEDGER.exists() else {}
-    spent = float(ledger.get(monat, {}).get("eur", 0))
-    limit_m = float(b.get("monatsbudget_eur") or 0)
-    print(f"Schätzung: {est['eur']:.2f} € (mit Puffer {est['eur_mit_puffer']:.2f} €) · Monat bisher {spent:.2f} € von {limit_m:.2f} €")
-    if est["eur_mit_puffer"] > float(b["max_pro_video_eur"]):
-        raise SystemExit("Schätzung über max_pro_video_eur – Abbruch, keine Kosten entstanden.")
-    if spent + est["eur_mit_puffer"] > limit_m:
-        raise SystemExit("Monatsbudget würde überschritten – Abbruch, keine Kosten entstanden.")
+    try:
+        # 3) Drehbuch (Claude-API, Höchstkosten vorher reserviert)
+        if not episode_path(slug, teil).exists():
+            if not b["drehbuch_api_aktiv"]:
+                _gesperrt(f"Drehbuch Teil {teil} fehlt und drehbuch_api_aktiv ist false.", d, story, teil, kasse)
+            from csu.script import generate, max_cost_eur
+            kasse.reservieren(run, max_cost_eur(), "Drehbuch (Claude-API, Höchstwert)")
+            git_sync(f"Kasse: Reservierung Drehbuch {d}", ["state"])
+            res = generate(story, st)
+            kasse.buchen(run, "anthropic", res["eur"], None,
+                         f"{res['usage'].get('input_tokens')}/{res['usage'].get('output_tokens')} Tokens")
+            kasse.aufloesen(run)
+        ep = load_episode(slug, teil)
+        errs, warns, info = validate_episode(story, ep, st, tuple(production()["video"]["ziel_sekunden"]))
+        for w in warns:
+            print("Hinweis:", w)
+        if errs:
+            raise BudgetStopp("Drehbuch ungültig – Abbruch vor Runway/ElevenLabs:\n  " + "\n  ".join(errs))
 
-    from storyhouse.budget import SpendGuard
-    from storyhouse.elevenlabs import ElevenLabsClient, check_subscription
-    from storyhouse.runway import RunwayClient
-    out = Path(a.out)
-    out.mkdir(parents=True, exist_ok=True)
-    g_rw = SpendGuard(limit_eur=float(b["max_pro_video_eur"]), pricing=pricing, cfg=cfg,
-                      log_path=out / "ausgaben_runway.json", provider="runway")
-    g_el = SpendGuard(limit_eur=float(b["max_pro_video_eur"]), pricing=pricing, cfg=cfg,
-                      log_path=out / "ausgaben_elevenlabs.json", provider="elevenlabs")
-    g_rw.link(g_el)
-    el = ElevenLabsClient(os.environ.get("ELEVENLABS_API_KEY", ""), g_el)
-    check_subscription(el.subscription(), plan.credits("elevenlabs"), cfg,
-                       needs_music=any(j.kind == "music" for j in plan.jobs))   # kostenlos, fail-closed
-    clients = {"runway": RunwayClient(os.environ.get("RUNWAYML_API_SECRET", ""), g_rw), "elevenlabs": el}
+        # 4) Kosten planen und Höchstbetrag reservieren
+        from storyhouse.budget import SpendGuard
+        from storyhouse.elevenlabs import ElevenLabsClient, check_subscription
+        from storyhouse.runway import RunwayClient
+        _, _, _, plan, pricing, cfg, est = _plan_for(slug)
+        rw_eur = pricing.credits_to_eur(plan.credits("runway"), cfg, "runway")
+        reserve = round(rw_eur * (1 + float(b["safety_margin"])), 2)
+        print(f"Runway: {plan.credits('runway'):.0f} Credits ≈ {rw_eur:.2f} € · Reservierung {reserve:.2f} € · "
+              f"ElevenLabs: {plan.credits('elevenlabs'):.0f} Credits (im Abo, 0 € zusätzlich)")
+        if reserve > float(b["max_pro_video_eur"]):
+            raise BudgetStopp(f"Folge würde bis zu {reserve:.2f} € kosten (> max_pro_video_eur).")
 
+        out = Path(a.out)
+        out.mkdir(parents=True, exist_ok=True)
+        g_rw = SpendGuard(limit_eur=reserve, pricing=pricing, cfg=cfg, log_path=out / "ausgaben_runway.json",
+                          provider="runway")
+        el_cap = pricing.credits_to_eur(plan.credits("elevenlabs"), cfg, "elevenlabs") * 1.3 + 0.5
+        g_el = SpendGuard(limit_eur=el_cap, pricing=pricing, cfg=cfg, log_path=out / "ausgaben_elevenlabs.json",
+                          provider="elevenlabs")
+        rw = RunwayClient(os.environ.get("RUNWAYML_API_SECRET", ""), g_rw)
+        el = ElevenLabsClient(os.environ.get("ELEVENLABS_API_KEY", ""), g_el)
+        saldo = rw.credit_balance()                                   # kostenlos
+        need = plan.credits("runway") + float(b.get("runway_min_restguthaben_credits", 0))
+        if saldo is None or saldo < need:
+            raise BudgetStopp(f"Runway-Guthaben {saldo} Credits < benötigt {need:.0f}. Kein automatischer Nachkauf – "
+                              "bitte Guthaben manuell aufladen (zählt zum Monatsbudget).")
+        check_subscription(el.subscription(), plan.credits("elevenlabs"), cfg,
+                           needs_music=any(j.kind == "music" for j in plan.jobs))   # kostenlos; Overage verweigert
+
+        kasse.reservieren(run, reserve, f"Folge {slug} Teil {teil} (Runway, Höchstwert)")
+        git_sync(f"Kasse: Reservierung {slug} Teil {teil}", ["state"])
+    except (BudgetStopp, BudgetError, ApprovalError, RunwayError, ElevenLabsError) as exc:
+        kasse.aufloesen(run)
+        save_state(st)
+        _summary(f"## ⛔ Produktion gestoppt ({d})\n\n{exc}\n\n{kasse.stand()}")
+        raise SystemExit(1)
+
+    # 5) Bezahlte Aufträge – jeder einzelne wird VOR dem Senden gegen die Reservierung geprüft
+    clients = {"runway": rw, "elevenlabs": el}
     from csu.render import assemble, run_jobs
+    ok = False
     try:
         files = run_jobs(plan, clients, out / "roh", ROOT / ".cache" / "auftraege")
-    finally:  # Ausgaben IMMER verbuchen, auch bei Abbruch
-        cost = round(g_rw.spent_eur + g_el.spent_eur, 2)
-        ledger.setdefault(monat, {"eur": 0.0, "videos": []})
-        ledger[monat]["eur"] = round(ledger[monat]["eur"] + cost, 2)
-        ledger[monat]["videos"].append({"datum": str(d), "geschichte": slug, "teil": teil, "eur": cost})
-        write_json(LEDGER, ledger)
+        ok = True
+    finally:  # tatsächliche Kosten IMMER buchen – auch bei Abbruch
+        kasse.buchen(run, "runway", g_rw.spent_eur, plan.credits("runway"), f"{slug} Teil {teil}")
+        kasse.buchen(run, "elevenlabs", 0.0, plan.credits("elevenlabs"), "im Abo enthalten")
+        kasse.aufloesen(run)
         save_state(st)
+        if not ok:
+            _summary(f"## ⛔ Produktion abgebrochen ({d})\n\nBezahlte Teilergebnisse liegen im Cache und werden "
+                     f"beim nächsten Lauf kostenlos wiederverwendet. Keine automatische Wiederholung.\n\n{kasse.stand()}")
 
     # neue Referenzbilder/Musik dauerhaft übernehmen (Figuren sehen in allen Folgen gleich aus)
     import shutil
@@ -230,15 +285,17 @@ def cmd_produzieren(a) -> None:
         if jid == "MUSIC_story":
             MUSIC.mkdir(parents=True, exist_ok=True)
             shutil.copy2(f, MUSIC / f"{slug}.mp3")
-    music = Path(plan.musik_datei) if plan.musik_datei else (files.get("MUSIC_story"))
+    music = Path(plan.musik_datei) if plan.musik_datei else files.get("MUSIC_story")
 
+    # 6) Schnitt (kostenlos)
     start_werte = json.loads(json.dumps(st["werte"]))
-    events = info["ereignisse"]
     filename = f"{d}_{slug}_teil-{teil:02d}.mp4"
-    result = assemble(story, ep, start_werte, events, files, music, out, filename)
+    result = assemble(story, ep, start_werte, info["ereignisse"], files, music, out, filename)
 
-    # Stand fortschreiben
+    # 7) Stand fortschreiben
     wahl = ep["entscheidung"]
+    kosten = kasse.run_kosten(run)
+    cost = round(sum(kosten.values()), 2)
     st["werte"] = info["endwerte"]
     st["verlauf"].append({"teil": teil, "datum": str(d), "datei": filename, "titel": ep["titel"],
                           "wahl_davor": (st.get("offene_entscheidung") or {}).get("option"),
@@ -247,12 +304,47 @@ def cmd_produzieren(a) -> None:
                                  "optionen": {str(k): v for k, v in wahl["optionen"].items()}, "option": None}
     st["naechster_teil"] = teil + 1
     save_state(st)
-    write_json(out / "release.json", {
-        "tag": f"{d}-{slug}-teil-{teil:02d}", "datei": result["datei"], "dateiname": filename,
-        "titel": f"{story['titel']} – Teil {teil}: {ep['titel']}",
-        "notiz": f"{story['titel']} · Teil {teil}/{story['teile']} · {result['laenge_s']:.0f} s · Kosten {cost:.2f} €\n\n"
-                 f"Frage: {wahl['frage']}\n" + "\n".join(f"{k}: {v['text']}" for k, v in wahl["optionen"].items())})
+
+    # 8) Produktionsbericht
+    tag = f"{d}-{slug}-teil-{teil:02d}"
+    repo = os.environ.get("GITHUB_REPOSITORY", "youtubeemo/cartoon-story-universe")
+    url = f"https://github.com/{repo}/releases/download/{tag}/{filename}"
+    laufzeit = time.time() - t_start
+    bericht = "\n".join([
+        f"# {story['titel']} – Teil {teil}: {ep['titel']}", "",
+        f"**Download (MP4):** {url}", "",
+        "| | |", "|---|---|",
+        f"| Datum | {d} |", f"| Länge | {result['laenge_s']:.1f} s · 1080×1920 · 30 fps · H.264/AAC |",
+        f"| Produktionszeit | {laufzeit / 60:.1f} min |",
+        f"| Kosten Runway | {kosten.get('runway', 0):.2f} € ({plan.credits('runway'):.0f} Credits) |",
+        f"| Kosten Drehbuch (Claude) | {kosten.get('anthropic', 0):.2f} € |",
+        f"| ElevenLabs | {plan.credits('elevenlabs'):.0f} Credits (im Abo, 0 €) |",
+        f"| **Kosten gesamt** | **{cost:.2f} €** |",
+        f"| Monatsbudget | {kasse.stand()} |", "",
+        f"**Zuschauerwahl der Vorfolge:** {wahl_text}", "",
+        f"**Neue Frage:** {wahl['frage']}", *[f"- {k}: {v['text']}" for k, v in wahl["optionen"].items()],
+        "", *([f"Hinweis: {n}" for n in plan.notes])])
+    rep = ROOT / "berichte" / f"{d}_{slug}_teil-{teil:02d}.md"
+    rep.parent.mkdir(exist_ok=True)
+    rep.write_text(bericht + "\n", encoding="utf-8")
+    _summary(bericht)
+    write_json(out / "release.json", {"tag": tag, "datei": result["datei"], "dateiname": filename, "url": url,
+                                      "titel": f"{story['titel']} – Teil {teil}: {ep['titel']}",
+                                      "bericht": str(rep)})
     print(f"✓ Fertig: {filename} ({result['laenge_s']:.1f} s, {cost:.2f} €)")
+
+
+def cmd_kasse(a) -> None:
+    from csu.kasse import Kasse
+    k = Kasse(float(budget().get("monatsbudget_eur") or 0), monat=a.monat)
+    if a.aufloesen:
+        if a.tatsaechlich is None:
+            raise SystemExit("--tatsaechlich EUR angeben (Betrag laut Anbieter-Abrechnung)")
+        k.buchen(a.aufloesen, "nachbuchung", a.tatsaechlich, None, "manuell nach Abrechnungskontrolle")
+        k.aufloesen(a.aufloesen)
+    print(k.stand())
+    for run, r in k.m["reservierungen"].items():
+        print(f"  offen: {run} {r['eur']:.2f} € seit {r['seit']} – {'; '.join(r['zweck'])}")
 
 
 def main(argv=None) -> None:
@@ -268,6 +360,8 @@ def main(argv=None) -> None:
     s.add_argument("--geplant", action="store_true", help="vom täglichen Zeitplan gestartet")
     s.add_argument("--youtube-video-id"); s.add_argument("--tiktok-stimmen")
     s.add_argument("--out", default="ausgabe")
+    s = sub.add_parser("kasse"); s.add_argument("--monat"); s.add_argument("--aufloesen", metavar="RUN")
+    s.add_argument("--tatsaechlich", type=float)
     a = p.parse_args(argv)
     {"heute": cmd_heute, "validate": cmd_validate, "estimate": cmd_estimate, "kosten": cmd_kosten,
-     "abstimmen": cmd_abstimmen, "produzieren": cmd_produzieren}[a.cmd](a)
+     "abstimmen": cmd_abstimmen, "produzieren": cmd_produzieren, "kasse": cmd_kasse}[a.cmd](a)

@@ -4,8 +4,8 @@ Automatische Produktion interaktiver 2D-Cartoon-Kurzvideos (9:16, 1080 × 1920, 
 Jeden Tag eine Folge, Mo–So je eine andere Geschichte; die Zuschauer entscheiden per Kommentar (1, 2 oder 3),
 wie es weitergeht. Fertige Videos kommen als **direkter MP4-Download** (GitHub-Release, kein ZIP).
 
-**Status:** vorbereitet, **alle kostenpflichtigen Schritte gesperrt** (`config/budget.yaml`). Es wurde noch kein Video
-gerendert und kein Cent ausgegeben.
+**Status:** vorbereitet, täglicher Zeitplan aktiv, **alle kostenpflichtigen Schritte gesperrt** (`config/budget.yaml`).
+Es wurde noch kein Video gerendert und kein Cent ausgegeben. Monatslimit: 150 €.
 
 ## Ablauf einer Folge
 
@@ -39,19 +39,26 @@ python -m csu validate                                   # alle Geschichten + n�
 python -m csu heute --datum 2026-11-23                   # was ist an dem Tag dran?
 python -m csu estimate --geschichte die-letzten-10000    # Kosten aus dem echten Auftragsplan
 python -m csu kosten                                     # Hochrechnung pro Video/Monat
+python -m csu kasse                                      # Monatsbudget, Reservierungen
 python -m pytest -q tests
 ```
 
+## Automatisierung
+
+Der Workflow „Tagesvideo produzieren“ läuft **täglich um 05:17 Uhr** (Berlin). Solange die Kosten nicht freigegeben
+sind, prüft er nur kostenlos und meldet „keine Produktion, 0 €“. Nach Freigabe läuft jeden Tag ohne Eingriff:
+Abstimmung auswerten → Drehbuch schreiben (Claude-API) → Figuren/Szenen vorbereiten → Animation (Runway) →
+deutsche Stimmen, Soundeffekte, lizenzierte Musik (ElevenLabs) → Schnitt mit Anzeigen und Untertiteln → MP4 →
+Produktionsbericht mit Kosten, Laufzeit und Download-Link (`berichte/`, Release, Issue). Budgetregeln: [`KOSTEN.md`](KOSTEN.md).
+
 ## Freigabe (Schritt für Schritt)
 
-1. **Secrets** (Repo → Settings → Secrets → Actions): `RUNWAYML_API_SECRET`, `ELEVENLABS_API_KEY`
-   (bezahlter Tarif, mind. Creator); optional `ANTHROPIC_API_KEY` (Drehbuch), `YOUTUBE_API_KEY`,
-   `YOUTUBE_CHANNEL_ID` (Abstimmung), `R2_*` (Download ohne GitHub-Login).
-2. **Budget** in `config/budget.yaml`: `monatsbudget_eur` setzen, `paid_rendering_enabled: true`.
-3. **Erstes Video** manuell: Actions → „Tagesvideo produzieren“ → Bestätigungsphrase eingeben. Dabei entstehen
-   einmalig die Figuren-Referenzbilder; sie werden ins Repo übernommen und in allen Folgen wiederverwendet.
-4. **Täglich automatisch:** `taeglich_aktiv: true` und den `schedule`-Block in `produktion.yml` einkommentieren.
-5. **Veröffentlichung** auf TikTok/YouTube bleibt aus, bis gesondert freigegeben.
+1. Secrets `RUNWAYML_API_SECRET`, `ELEVENLABS_API_KEY` sind vorhanden; zusätzlich `ANTHROPIC_API_KEY` für die täglichen
+   Drehbücher (optional `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_ID`, `R2_*`).
+2. Runway-Guthaben manuell aufladen (306 Credits reichen nicht für eine Folge), Auto-Reload überall aus lassen.
+3. In `config/budget.yaml`: `paid_rendering_enabled: true`, `drehbuch_api_aktiv: true`, `taeglich_aktiv: true`.
+   Das Monatslimit von 150 € ist bereits eingetragen.
+4. Veröffentlichung auf TikTok/YouTube bleibt aus, bis gesondert freigegeben.
 
 ## Download auf dem iPhone
 

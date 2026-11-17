@@ -44,7 +44,6 @@ sprecher:                     # durchgehender deutscher Erzähler (ElevenLabs, P
   model: eleven_v3
   stability: 0.5
 
-drehbuch_modell: claude-sonnet-5-5   # Claude-API, nur wenn drehbuch_api_aktiv
 
 profil: test                  # test = gen4_image_turbo + gen4_turbo · final = gen4_image + gen4.5
 

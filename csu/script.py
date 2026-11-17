@@ -11,7 +11,7 @@ import urllib.request
 
 import yaml
 
-from csu.common import STORIES, episode_path, load_episode, production
+from csu.common import STORIES, budget, episode_path, load_episode
 
 SYSTEM = """Du schreibst Folgen einer deutschen 2D-Cartoon-Serie im Hochformat (TikTok/Shorts), 60–90 Sekunden.
 Antworte NUR mit gültigem YAML im exakt gleichen Schema wie die Beispiel-Folge. Regeln:
@@ -41,12 +41,33 @@ def build_prompt(story: dict, state: dict) -> str:
     ])
 
 
-def generate(story: dict, state: dict, api_key: str | None = None) -> str:
+def max_cost_eur() -> float:
+    """Höchstmögliche Kosten eines Drehbuch-Aufrufs (inkl. USt., ungünstiger Kurs) – wird vorab reserviert."""
+    b = budget()
+    a = b["anthropic"]
+    usd = a["max_input_tokens"] / 1e6 * a["usd_input_mtok"] + a["max_output_tokens"] / 1e6 * a["usd_output_mtok"]
+    return round(usd * float(b["eur_per_usd"]) * (1 + float(b["vat_rate"])), 4)
+
+
+def cost_eur(usage: dict) -> float:
+    b = budget()
+    a = b["anthropic"]
+    usd = (usage.get("input_tokens", 0) / 1e6 * a["usd_input_mtok"]
+           + usage.get("output_tokens", 0) / 1e6 * a["usd_output_mtok"])
+    return round(usd * float(b["eur_per_usd"]) * (1 + float(b["vat_rate"])), 4)
+
+
+def generate(story: dict, state: dict, api_key: str | None = None) -> dict:
+    """Ein einziger Aufruf, keine Wiederholung. Rückgabe {pfad, usage, eur}."""
     key = api_key or os.environ.get("ANTHROPIC_API_KEY")
     if not key:
         raise SystemExit("ANTHROPIC_API_KEY fehlt")
-    body = {"model": production().get("drehbuch_modell", "claude-sonnet-5-5"), "max_tokens": 8000,
-            "system": SYSTEM, "messages": [{"role": "user", "content": build_prompt(story, state)}]}
+    a = budget()["anthropic"]
+    prompt = build_prompt(story, state)
+    if (len(prompt) + len(SYSTEM)) / 3.0 > a["max_input_tokens"]:   # konservativ: 3 Zeichen je Token
+        raise SystemExit("Drehbuch-Anfrage wäre größer als die reservierte Tokenmenge – Abbruch vor dem Senden.")
+    body = {"model": a["modell"], "max_tokens": int(a["max_output_tokens"]),
+            "system": SYSTEM, "messages": [{"role": "user", "content": prompt}]}
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
                                  headers={"x-api-key": key, "anthropic-version": "2023-06-01",
                                           "content-type": "application/json"})
@@ -58,4 +79,4 @@ def generate(story: dict, state: dict, api_key: str | None = None) -> str:
     path.write_text(text + "\n", encoding="utf-8")
     usage = data.get("usage", {})
     print(f"Drehbuch geschrieben: {path.name} (Tokens ein/aus: {usage.get('input_tokens')}/{usage.get('output_tokens')})")
-    return str(path)
+    return {"pfad": str(path), "usage": usage, "eur": cost_eur(usage)}
