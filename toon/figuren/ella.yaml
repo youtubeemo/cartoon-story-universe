@@ -1,0 +1,13 @@
+name: Ella Funke
+geschichte: das-haus-am-nebelsee
+groesse: 0.97
+haut: "#F2CBB0"
+augen: "#6B4A2A"
+haare: {stil: bob, farbe: "#7A4E2D"}
+brille: {art: rund, farbe: "#1B1B1F"}
+oberteil: "#F2C230"
+mantel: "#F2C230"
+knoepfe: "#C9952E"
+hose: "#2B3F73"
+schuhe: "#8E2B3A"
+stimme: {piper: de_DE-kerstin-low}

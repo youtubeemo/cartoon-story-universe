@@ -1,0 +1,7 @@
+name: BOLT
+geschichte: station-kepler-9
+typ: roboter
+schale: "#F4F4F4"
+akzent: "#E4572E"
+auge: "#2EC4B6"
+stimme: {piper: de_DE-thorsten-high, pitch: 1.25}

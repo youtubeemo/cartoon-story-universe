@@ -1,0 +1,12 @@
+titel: Bankbüro
+bodenfarbe: "#8A94A6"
+sitze: {stuhl: 520}
+eingang_links: -140
+elemente:
+  - {typ: wand, farbe: "#C9D3DE", muster: paneel}
+  - {typ: boden, art: fliesen, farbe: "#8A94A6"}
+  - {typ: standuhr, x: 1160}
+  - {typ: tisch, x: 620, w: 520, farbe: "#5A6478", h: 360}
+  - {typ: regal, x: 80, y: 520, w: 360, inhalt: buecher}
+  - {typ: lampe, x: 720, farbe: "#8A94A6"}
+  - {typ: stuhl, x: 520, farbe: "#3E4658"}

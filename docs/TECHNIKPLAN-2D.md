@@ -27,16 +27,21 @@ Nachteil der Wahl: Der Look beschränkt sich auf flache Cut-out-Cartoons (passt 
 | `render.py` | Hintergrund einmal je Einstellung, Figuren je Bild, Blenden, Ausgabe nativ 1080×1920, 30 fps, H.264 (crf 17)/AAC | fertig |
 | Statusanzeigen/Untertitel | aus der bestehenden Pipeline (`csu/hud.py`, `csu/state.py`) wiederverwendet | fertig |
 
-## 3. Nächste Schritte bis zur täglichen Produktion
+## 3. Stand 18.11.2026 (Ausbaustufe 2)
 
-1. **Bewegungsbausteine erweitern**: Gehen von A nach B (Laufzyklus), Umdrehen, Hinsetzen, Tür öffnen, Gegenstände übergeben.
-2. **Seitenansicht der Figuren** (bisher wirkt nur der Kopf gedreht).
-3. **Alle Orte und Figuren der 7 Geschichten** anlegen: etwa 18 Orte und 17 Figuren, alles einmalig und danach wiederverwendet.
-4. **Drehbuch-KI auf Storyboard v3** umstellen. Claude schreibt nur noch Beats (Haltung, Ausdruck, Aktion, Text), keine Bild-Prompts.
-5. **Produktionsworkflow** auf `toon` umstellen: Abstimmung, Storyboard, Prüfung, Ton, Render, Qualitätskontrolle, Release. Die Qualitätskontrolle für Ton, Untertitel, Länge und Auflösung wird übernommen.
-6. **Stimmen in Produktionsqualität**: ElevenLabs im Abo (nach Freigabe). Piper ist kostenlos, klingt aber deutlich synthetischer.
-7. **Musik**: je Geschichte einmal mit ElevenLabs (im Abo) oder aus einer lizenzfreien Bibliothek. Die synthetische Musik ist nur ein Platzhalter.
-8. **Stilbibel an deine Videoreferenz anpassen**, sobald sie vorliegt.
+| Bereich | Stand |
+|---|---|
+| Rig „2,5D“ | Körperdrehung stufenlos (vorne ↔ Dreiviertel ↔ Profil), Gliedmaßen mit echter Verkürzung, nahe/ferne Arme und Beine richtig überdeckt, Kopf dreht zusätzlich |
+| Bewegungen | Gehen (Schrittzyklus, Armschwung, Anfahren/Abbremsen, Schrittgeräusche), Drehen (mit Blinzeln), Hinsetzen/Aufstehen, Übergeben von Hand zu Hand, Auf- und Abgänge, Jubeln, Nicken, Kopfschütteln, Erschrecken, Winken, Seufzen, Lachen, Stampfen; 18 Haltungen |
+| Mimik/Gestik | 11 Ausdrücke inkl. Lachfalten, Brauen-Betonung auf offenen Vokalen, Sprechgesten, Nicken am Satzende, größere Mundformen, Mund verengt sich bei Drehung |
+| Figuren | alle 18 Figuren der 7 Geschichten (15 Menschen, Hund Pixel, Roboter BOLT, Drache Glut; Papagei Kiko auf Tobis Schulter) |
+| Orte | alle 18 Schauplätze aus 45 wiederverwendbaren Bauteilen (`toon/bausteine.py`, `toon/orte/*.yaml`), 4 Tageszeiten, Sitzplätze |
+| Storyboard v3 | Positionen, Requisiten und Sitzen laufen über Schnitte durch; Prüfung verhindert Springen, Gehen im Sitzen, Übergaben ohne Gegenstand, Sprung-Schnitte, unbekannte Orte/Sitze |
+| Stimmen | ElevenLabs (Abo) mit harter Credit-Grenze, kostenloser Abo-Prüfung, Emotions-Tags aus dem Ausdruck, Archiv gegen Doppelzahlung; Piper als kostenloser Ersatz |
+| Musik/Geräusche | eigener Komponist (Akkordfolge, Bass, Begleitung, Motiv, Schlagwerk; 6 Stimmungen), Schritte, Stuhl, Ladenglocke, Tür, Papier, Posaune, Kasse, Whoosh; Musik duckt unter Sprache |
+| Produktion | `python -m toon folge` + Workflow „Tagesfolge 2D“ (Abstimmung, Drehbuch-KI v3, Prüfung, Render, QC, Stand, Release); täglicher Zeitplan **aus** |
+
+Noch offen: Bewegungen mit Gegenständen im Raum (Tür öffnen, Treppen), Tierfiguren mit weniger Aktionen, Stilbibel an die Videoreferenz anpassen (Referenz liegt nicht vor).
 
 ## 4. Kosten
 

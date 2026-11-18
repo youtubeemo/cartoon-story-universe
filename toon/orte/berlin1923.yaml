@@ -1,0 +1,13 @@
+titel: Berlin 1923
+bodenfarbe: "#9A938A"
+eingang_links: -140
+eingang_rechts: 1580
+tageslicht: true
+elemente:
+  - {typ: himmel, wolken: true}
+  - {typ: haus, x: -40, w: 620, h: 1300, farbe: "#C9B79C", dach: "#6B3E26", fenster_n: 3}
+  - {typ: haus, x: 580, w: 900, h: 1150, farbe: "#B8A58A", dach: "#4A3A2A", fenster_n: 3}
+  - {typ: tram, x: 300}
+  - {typ: boden, art: pflaster, farbe: "#9A938A"}
+  - {typ: litfass, x: 1180}
+  - {typ: laterne, x: 120}

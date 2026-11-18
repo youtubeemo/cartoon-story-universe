@@ -1,0 +1,13 @@
+name: Kapitänin Rosa
+geschichte: die-karte-der-sieben-gipfel
+groesse: 1.02
+haut: "#F2C9A8"
+augen: "#2E6B4A"
+haare: {stil: locken, farbe: "#C2402B"}
+hut: {art: dreispitz, farbe: "#2B1D16"}
+oberteil: "#7A4E2D"
+jacke: {farbe: "#7A4E2D", offen: true, innen: "#F4F1E8"}
+knoepfe: "#E2B64A"
+hose: "#3A3A44"
+schuhe: "#2B1D16"
+stimme: {piper: de_DE-kerstin-low}

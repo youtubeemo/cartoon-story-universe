@@ -1,0 +1,14 @@
+name: Ritterin Brunhild
+geschichte: der-drachenimbiss
+groesse: 1.12
+koerper: kraeftig
+haut: "#F0D2BE"
+augen: "#2B2B2B"
+haare: {stil: kurz, farbe: "#C2402B"}
+hut: {art: helm, farbe: "#B0B6BE", feder: "#C2402B"}
+oberteil: "#B0B6BE"
+aermel: "#9AA1AB"
+guertel: "#6B3E26"
+hose: "#9AA1AB"
+schuhe: "#6B7380"
+stimme: {piper: de_DE-kerstin-low, pitch: 0.9}

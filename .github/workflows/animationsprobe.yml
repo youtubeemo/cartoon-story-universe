@@ -1,7 +1,7 @@
-# Animationsprobe – KOSTENLOS (keine bezahlten APIs): eigenes 2D-Rig, Piper-Stimmen (CC0),
-# Rhubarb-Lippensync (MIT, Prüfsumme in config/rhubarb.yaml), synthetische Musik/Effekte, FFmpeg.
-# Verbraucht nur GitHub-Actions-Minuten (≈ 5). Nur manuell startbar.
-name: Animationsprobe (kostenlos)
+# Animationsprobe der 2D-Pipeline. Kostenlos mit Piper; mit ElevenLabs nur im vorhandenen Abo:
+# harte Credit-Grenze (Eingabe), kostenlose Vorprüfung von Tarif/Restkontingent/Nachberechnung, Archiv gegen
+# Doppelzahlung (assets/stimmen). Nur manuell startbar. Runway wird nicht verwendet.
+name: Animationsprobe
 
 on:
   workflow_dispatch:
@@ -9,10 +9,27 @@ on:
       storyboard:
         description: "Storyboard-Datei"
         required: false
-        default: probe/animationsprobe.yaml
+        default: probe/animationsprobe2.yaml
+      stimmen:
+        description: "piper (kostenlos) oder elevenlabs (Abo-Credits)"
+        required: true
+        type: choice
+        options: [piper, elevenlabs]
+      credit_grenze:
+        description: "Höchstens so viele ElevenLabs-Credits"
+        required: false
+        default: "300"
+      max_sekunden:
+        description: "Maximale Länge"
+        required: false
+        default: "20"
 
 permissions:
   contents: write
+
+concurrency:
+  group: produktion
+  cancel-in-progress: false
 
 jobs:
   probe:
@@ -26,6 +43,7 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core >/dev/null
           pip install -q -r requirements.txt piper-tts==1.8.0
+          bash scripts/storyhouse_holen.sh
       - name: Piper-Stimmen aus dem Cache
         uses: actions/cache@v4
         with:
@@ -41,12 +59,24 @@ jobs:
           BIN=$(find "$HOME/rhubarb" -type f -name rhubarb | head -n 1); chmod +x "$BIN"
           echo "RHUBARB_BIN=$BIN" >> "$GITHUB_ENV"
       - name: Probe rendern
-        run: python -m toon probe --storyboard "${{ inputs.storyboard || 'probe/animationsprobe.yaml' }}" --out ausgabe/probe
-      - name: Als Release zur Ansicht (direkter MP4-Download)
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          SB: ${{ inputs.storyboard }}
+          ST: ${{ inputs.stimmen }}
+          CG: ${{ inputs.credit_grenze }}
+          MS: ${{ inputs.max_sekunden }}
+        run: python -m toon probe --storyboard "$SB" --stimmen "$ST" --credit-grenze "$CG" --max-sekunden "$MS" --out ausgabe/probe
+      - name: Stimmen-Archiv sichern (nie doppelt bezahlen)
+        if: always()
+        run: |
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
+          git add assets/stimmen 2>/dev/null || true
+          git diff --cached --quiet || (git commit -q -m "Stimmen-Archiv (Animationsprobe)" && git push -q) || true
+      - name: Als Release (direkter MP4-Download)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="animationsprobe-$(date +%Y%m%d-%H%M)"
-          python -c "import json;b=json.load(open('ausgabe/probe/bericht.json'));print('\n'.join(f'- {k}: {v}' for k,v in b.items()))" > notiz.txt
-          gh release create "$TAG" ausgabe/probe/animationsprobe.mp4 --prerelease --title "Animationsprobe (2D-Rig, kostenlos)" --notes-file notiz.txt
-          echo "### Animationsprobe: https://github.com/${{ github.repository }}/releases/download/$TAG/animationsprobe.mp4" >> "$GITHUB_STEP_SUMMARY"
+          python -c "import json;b=json.load(open('ausgabe/probe/bericht.json'));print('\n'.join(f'- {k}: {v}' for k,v in b.items() if k!='endwerte'))" > notiz.txt
+          gh release create "$TAG" ausgabe/probe/animationsprobe.mp4 --prerelease --title "Animationsprobe (2D-Rig, ${{ inputs.stimmen }})" --notes-file notiz.txt
+          echo "### https://github.com/${{ github.repository }}/releases/download/$TAG/animationsprobe.mp4" >> "$GITHUB_STEP_SUMMARY"

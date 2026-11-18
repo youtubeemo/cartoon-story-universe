@@ -34,6 +34,9 @@ auto_retry: false
 # Runway: Guthaben wird vor jedem Lauf kostenlos abgefragt; reicht es nicht → Stopp, kein Nachkauf.
 runway_min_restguthaben_credits: 0
 
+# ElevenLabs-Credits (im Creator-Abo, 0 € zusätzlich) – harte Obergrenze je Folge
+elevenlabs_max_credits_pro_folge: 2500
+
 elevenlabs:
   require_commercial_license: true   # Free-Tarif wird verweigert
   music_license_confirmed: true      # Creator-Tarif: kommerzielle Nutzung inkl. Musik; Musik je Geschichte nur EINMAL

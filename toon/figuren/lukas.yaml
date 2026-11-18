@@ -1,0 +1,14 @@
+name: Lukas
+geschichte: der-drachenimbiss
+groesse: 1.02
+koerper: kraeftig
+haut: "#F2C9A8"
+augen: "#3A6EA5"
+haare: {stil: kurz, farbe: "#E2B64A"}
+hut: {art: dutt, farbe: "#E2B64A"}
+bart: "#D9A63A"
+oberteil: "#FFFFFF"
+knoepfe: "#B0B6BE"
+hose: "#3A3A44"
+schuhe: "#3A2A1A"
+stimme: {piper: de_DE-thorsten_emotional-medium, sprecher: amused}

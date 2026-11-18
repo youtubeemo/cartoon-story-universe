@@ -1,0 +1,11 @@
+titel: Strand von Insel Nr. 7
+bodenfarbe: "#F2D79B"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel}
+  - {typ: wasser, y0: 1350, y1: 1720, farbe: "#2EC4B6"}
+  - {typ: wrack, x: 1050, y: 1600}
+  - {typ: boden, art: sand, farbe: "#F2D79B", y0: 1720}
+  - {typ: palme, x: 180, h: 1000}
+  - {typ: felsen, x: 1100, w: 320, h: 180, y1: 1900}

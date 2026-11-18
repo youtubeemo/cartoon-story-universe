@@ -1,0 +1,13 @@
+name: Nova
+geschichte: station-kepler-9
+groesse: 1.0
+haut: "#C98E6A"
+augen: "#3B2A20"
+haare: {stil: undercut, farbe: "#8E5CC2"}
+headset: true
+oberteil: "#F4F4F4"
+streifen: "#E4572E"
+guertel: "#5A6478"
+hose: "#F4F4F4"
+schuhe: "#5A6478"
+stimme: {piper: de_DE-kerstin-low}

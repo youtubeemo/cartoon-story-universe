@@ -1,0 +1,12 @@
+titel: Schwebender Gipfel mit Ruinen
+bodenfarbe: "#7FB069"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel}
+  - {typ: wolkenmeer, y: 1550}
+  - {typ: berg, x: -200, w: 900, h: 900, y1: 1700, farbe: "#9AAFC9"}
+  - {typ: saeule, x: 900, h: 900}
+  - {typ: saeule, x: 1160, h: 900, kaputt: true}
+  - {typ: wasserfall, x: 520, y0: 900, y1: 1700}
+  - {typ: boden, art: gras, farbe: "#7FB069"}

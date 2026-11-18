@@ -1,0 +1,12 @@
+titel: Deck des Luftschiffs „Möwe“
+bodenfarbe: "#B97A4E"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel}
+  - {typ: wolkenmeer, y: 1450}
+  - {typ: schwebegipfel, x: 980, y: 1180, w: 400}
+  - {typ: ballon, farbe: "#E4572E"}
+  - {typ: reling, y: 1700}
+  - {typ: boden, art: deck, farbe: "#B97A4E", y0: 1700}
+  - {typ: steuerrad, x: 260, y: 1560}

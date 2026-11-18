@@ -1,0 +1,12 @@
+name: Ben
+geschichte: die-taschenuhr-von-1923
+groesse: 1.0
+haut: "#E8B98F"
+augen: "#3B2A20"
+haare: {stil: locken, farbe: "#2B1D16"}
+brille: {art: lupe, farbe: "#C9A04A"}
+oberteil: "#3A6EA5"
+schuerze: "#7A4E2D"
+hose: "#3A3A44"
+schuhe: "#5A3A2A"
+stimme: {piper: de_DE-thorsten_emotional-medium, sprecher: neutral}

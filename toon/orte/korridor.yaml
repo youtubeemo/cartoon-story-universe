@@ -1,0 +1,11 @@
+titel: Stationskorridor
+bodenfarbe: "#6B7588"
+tageslicht: false
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: wand, farbe: "#DDE3EA", muster: metall}
+  - {typ: rohre, y: 160}
+  - {typ: fenster, x: 520, y: 520, w: 420, rund: true, rahmen: "#E4572E"}
+  - {typ: luke, x: 1060}
+  - {typ: boden, art: metall, farbe: "#6B7588"}
