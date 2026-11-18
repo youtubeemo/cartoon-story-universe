@@ -161,6 +161,8 @@ def cmd_bilder(a) -> int:
     auftr = bplan.auftraege(story, sb, st)
     if a.nur:
         wahl = {f"IMG_{x.strip()}" for x in a.nur.split(",")}
+        if not wahl <= {x.id for x in auftr}:
+            raise SystemExit(f"Unbekannte Shots in --nur: {a.nur}")
         noetig = {r for x in auftr if x.id in wahl for r in x.refs}
         auftr = [x for x in auftr if x.id in wahl or x.id in noetig]
     lauf = Lauf(a, "illu-bilder")
@@ -181,10 +183,13 @@ def cmd_bilder(a) -> int:
         print("Alle Bilder liegen schon im Archiv – 0 €.")
         return 0
     eur = p.eur(lauf.pricing, lauf.cfg)
-    print(f"{len(p.jobs)} Bilder, {p.credits('runway'):.0f} Credits, bis zu {eur:.2f} €")
+    print(f"{len(p.jobs)} Bilder, {p.credits('runway'):.0f} Credits, bis zu {eur:.2f} € (Obergrenze {a.max_eur:.2f} €)")
+    if eur > a.max_eur + 1e-9:
+        print(f"⛔ {eur:.2f} € > freigegebene {a.max_eur:.2f} € – nichts gesendet, keine Kosten.")
+        return 1
     try:
-        lauf.reservieren(eur, f"Weg-1-Bilder {a.slug} {a.teil}")
-        clients = lauf.clients(p.credits("runway"), 0, False, eur)
+        lauf.reservieren(a.max_eur, f"Weg-1-Bilder {a.slug} {a.teil}")
+        clients = lauf.clients(p.credits("runway"), 0, False, a.max_eur)   # SpendGuard: harte Grenze
         files = run_jobs(p, clients, Path(a.out) / "roh", ROOT / "cache" / "illu")
     except STOPP as exc:
         lauf.stopp(exc)
@@ -208,6 +213,7 @@ def main(argv: list[str] | None = None) -> int:
         if name == "bilder":
             s.add_argument("--bestaetigung", default="")
             s.add_argument("--nur", default="")
+            s.add_argument("--max-eur", type=float, required=True)
             s.add_argument("--datum", default="")
             s.add_argument("--geplant", action="store_true")
         if name == "folge":
