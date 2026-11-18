@@ -297,7 +297,10 @@ def cmd_bilder(a) -> int:
         clients = lauf.clients(p.credits("runway"), 0, False, a.max_eur - ki_eur)   # SpendGuard: harte Grenze
         # Zwischenspeicher im Archivordner: wird vom Workflow immer committet → bezahlte Bilder gehen nie verloren
         files = run_jobs(p, clients, Path(a.out) / "roh", bplan.ARCHIV / a.slug / "cache")
-    except STOPP as exc:
+    except STOPP as exc:                    # Abbruch: bereits erzeugte (bezahlte) Bilder trotzdem buchen
+        if getattr(lauf, "guards", None) and lauf.guards[0].spent_eur > 0:
+            lauf.kasse.buchen(lauf.run, "runway", lauf.guards[0].spent_eur, lauf.guards[0].spent_credits,
+                              "Abbruch – bereits erzeugte Bilder (liegen im Archiv-Zwischenspeicher)")
         lauf.stopp(exc)
     except Exception:                       # unerwarteter Fehler: bisher Ausgegebenes trotzdem buchen
         if getattr(lauf, "guards", None):

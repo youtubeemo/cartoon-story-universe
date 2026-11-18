@@ -8,4 +8,5 @@ ausgabe/
 .env
 voices/
 out/
-cache/
+/cache/
+*.q2.jpg
