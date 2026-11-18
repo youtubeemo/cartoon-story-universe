@@ -1,0 +1,14 @@
+name: Jonas
+geschichte: die-letzten-10000
+groesse: 1.0
+koerper: schlank
+haut: "#F6CFAE"
+augen: "#3A7D44"
+haare: {stil: locken, farbe: "#D9572B"}
+sommersprossen: true
+oberteil: "#F28B26"
+jacke: {farbe: "#F28B26", offen: true, innen: "#FFFFFF"}
+hose: "#6F7782"
+schuhe: "#FFFFFF"
+rucksack: "#7FD1B9"
+stimme: {piper: de_DE-thorsten_emotional-medium, sprecher: amused, pitch: 1.06}

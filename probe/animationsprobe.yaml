@@ -1,0 +1,41 @@
+# Animationsprobe – „Die letzten 10.000 €“ (Ausschnitt). Storyboard-Format v3 (2D-Rig, keine KI-Videos).
+titel: "Animationsprobe: Das Erbe mit Haken"
+geschichte: die-letzten-10000
+musik: {bpm: 96}
+einstellungen:
+  - nr: 1
+    ort: backstube
+    tageszeit: morgen
+    kamera: halbtotale
+    uebergang: abblende
+    figuren: {jonas: {x: 560}, aylin: {x: 960}}
+    ablauf:
+      - {figur: jonas, haltung: brief_lesen, parallel: true}
+      - {figur: aylin, haltung: arme_verschraenkt, parallel: true}
+      - {sfx: papier, pause: 0.5}
+      - {erzaehler: "Oma Edith hat Jonas alles vererbt."}
+      - {figur: jonas, ausdruck: ueberrascht, aktion: erschrecken, pause: 0.45}
+      - {figur: jonas, haltung: stehen, ausdruck: begeistert, aktion: jubeln, sfx: jubel, hud: {key: geld, zu: 10000},
+         sagt: "Zehntausend Euro! Ich bin reich!"}
+      - {figur: aylin, ausdruck: skeptisch, sagt: "Lies weiter. Da ist noch eine Seite."}
+  - nr: 2
+    ort: backstube
+    tageszeit: morgen
+    kamera: nah
+    fokus: [jonas]
+    uebergang: schnitt
+    figuren: {jonas: {x: 560}, aylin: {x: 960}}
+    ablauf:
+      - {figur: jonas, haltung: brief_hoch, ausdruck: neutral, sfx: papier, pause: 0.7}
+      - {figur: jonas, ausdruck: besorgt, sagt: "Achtzehntausend Euro Schulden?"}
+      - {figur: jonas, haltung: brief_sinken, ausdruck: traurig, sfx: posaune, pause: 2.1}
+  - nr: 3
+    ort: backstube
+    tageszeit: morgen
+    kamera: halbtotale
+    uebergang: schnitt
+    figuren: {jonas: {x: 560}, aylin: {x: 960}}
+    nachlauf: 0.9
+    ablauf:
+      - {figur: aylin, haltung: haende_hueften, ausdruck: verschmitzt, aktion: nicken, sagt: "Willkommen im Bäckerleben, Chef."}
+      - {figur: jonas, aktion: seufzen, ausdruck: besorgt, pause: 1.3}

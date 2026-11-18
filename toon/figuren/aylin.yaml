@@ -1,0 +1,13 @@
+name: Aylin
+geschichte: die-letzten-10000
+groesse: 0.96
+koerper: normal
+haut: "#D9A27B"
+augen: "#4A2C1A"
+haare: {stil: zopf, farbe: "#1F1A1C"}
+oberteil: "#FFFFFF"
+schuerze: "#2B3F73"
+lange_aermel: false
+hose: "#3A3A44"
+schuhe: "#5A3A2A"
+stimme: {piper: de_DE-kerstin-low, pitch: 1.0}

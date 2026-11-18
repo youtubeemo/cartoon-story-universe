@@ -1,0 +1,5 @@
+# Rhubarb Lip Sync 1.14.0 (MIT, Daniel S. Wolf) – präzise Mundformen aus der Sprachdatei.
+# Die Datei wird NUR verwendet, wenn die SHA-256-Prüfsumme übereinstimmt (ermittelt 18.11.2026 von der offiziellen Release-Seite).
+url: https://github.com/DanielSWolf/rhubarb-lip-sync/releases/download/v1.14.0/Rhubarb-Lip-Sync-1.14.0-Linux.zip
+sha256: a9a9074862cff47b2d59b8bf399a678a3b0b74f9452ad6ad94cb292913dd8667
+erkennung: phonetic        # sprachunabhängige Lauterkennung (Deutsch); "pocketSphinx" wäre nur Englisch

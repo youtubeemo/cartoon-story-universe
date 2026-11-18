@@ -1,0 +1,52 @@
+# Animationsprobe – KOSTENLOS (keine bezahlten APIs): eigenes 2D-Rig, Piper-Stimmen (CC0),
+# Rhubarb-Lippensync (MIT, Prüfsumme in config/rhubarb.yaml), synthetische Musik/Effekte, FFmpeg.
+# Verbraucht nur GitHub-Actions-Minuten (≈ 5). Nur manuell startbar.
+name: Animationsprobe (kostenlos)
+
+on:
+  workflow_dispatch:
+    inputs:
+      storyboard:
+        description: "Storyboard-Datei"
+        required: false
+        default: probe/animationsprobe.yaml
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Werkzeuge
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core >/dev/null
+          pip install -q -r requirements.txt piper-tts==1.8.0
+      - name: Piper-Stimmen aus dem Cache
+        uses: actions/cache@v4
+        with:
+          path: voices
+          key: piper-voices-v1
+      - name: Rhubarb Lip Sync (nur mit passender Prüfsumme)
+        run: |
+          URL=$(python -c "import yaml;print(yaml.safe_load(open('config/rhubarb.yaml'))['url'])")
+          SHA=$(python -c "import yaml;print(yaml.safe_load(open('config/rhubarb.yaml'))['sha256'])")
+          curl -fsSL --retry 3 "$URL" -o /tmp/rhubarb.zip
+          echo "$SHA  /tmp/rhubarb.zip" | sha256sum -c -
+          unzip -q /tmp/rhubarb.zip -d "$HOME/rhubarb"
+          BIN=$(find "$HOME/rhubarb" -type f -name rhubarb | head -n 1); chmod +x "$BIN"
+          echo "RHUBARB_BIN=$BIN" >> "$GITHUB_ENV"
+      - name: Probe rendern
+        run: python -m toon probe --storyboard "${{ inputs.storyboard || 'probe/animationsprobe.yaml' }}" --out ausgabe/probe
+      - name: Als Release zur Ansicht (direkter MP4-Download)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="animationsprobe-$(date +%Y%m%d-%H%M)"
+          python -c "import json;b=json.load(open('ausgabe/probe/bericht.json'));print('\n'.join(f'- {k}: {v}' for k,v in b.items()))" > notiz.txt
+          gh release create "$TAG" ausgabe/probe/animationsprobe.mp4 --prerelease --title "Animationsprobe (2D-Rig, kostenlos)" --notes-file notiz.txt
+          echo "### Animationsprobe: https://github.com/${{ github.repository }}/releases/download/$TAG/animationsprobe.mp4" >> "$GITHUB_STEP_SUMMARY"

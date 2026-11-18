@@ -1,0 +1,14 @@
+name: Herr Grell
+geschichte: die-letzten-10000
+groesse: 1.08
+koerper: schlank
+haut: "#EBC7B0"
+augen: "#2B2B2B"
+haare: {stil: glatze, farbe: "#1B1B1F"}
+schnurrbart: spitz
+oberteil: "#6B3FA0"
+weste: "#4E2C7A"
+krawatte: "#E9C46A"
+hose: "#6B3FA0"
+schuhe: "#1B1B1F"
+stimme: {piper: de_DE-thorsten-high, pitch: 0.92}

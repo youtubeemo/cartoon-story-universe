@@ -6,3 +6,4 @@ vendor/
 ausgabe/
 *.mp4
 .env
+voices/
