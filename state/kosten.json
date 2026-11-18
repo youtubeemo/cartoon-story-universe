@@ -2,7 +2,7 @@
   "version": 2,
   "monate": {
     "2026-11": {
-      "gebucht_eur": 5.8694,
+      "gebucht_eur": 6.0594,
       "reservierungen": {},
       "posten": [
         {
@@ -52,6 +52,14 @@
           "eur": 0.76,
           "credits": 64.0,
           "notiz": "Weg-1-Bilder die-letzten-10000 1"
+        },
+        {
+          "zeit": "2026-11-18T15:04:50+01:00",
+          "run": "44319629425",
+          "anbieter": "runway",
+          "eur": 0.19,
+          "credits": 16,
+          "notiz": "Referenztest: Jonas+Aylin erzeugt (Runway-Task Grell FAILED → 0 Credits laut Client); Bilder wegen .gitignore nicht gesichert"
         }
       ],
       "limit_eur": 150.0
