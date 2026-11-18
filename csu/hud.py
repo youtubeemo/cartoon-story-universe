@@ -125,6 +125,7 @@ def build_ass(story: dict, start_werte: dict, events: list[dict], total: float, 
         if ev["key"] in by_key:
             by_key[ev["key"]].append(ev)
 
+    hud_lines: list[tuple] = []
     for i, key in enumerate(rows):
         d = hud[key]
         y = HUD_Y + i * ROW_H
@@ -136,7 +137,7 @@ def build_ass(story: dict, start_werte: dict, events: list[dict], total: float, 
         for ev in evs:
             # konstanter Abschnitt bis zum Ereignis
             if ev["t"] > cur_t:
-                lines.append(_ev(1, cur_t, ev["t"], "HUD", f"{pos}{label}: {esc(fmt_value(d, cur_v))}"))
+                hud_lines.append((1, cur_t, ev["t"], "HUD", f"{pos}{label}: {esc(fmt_value(d, cur_v))}"))
             good = _good(d, ev["vorher"], ev["nachher"])
             col = GOOD if good else BAD
             numeric = d["typ"] != "inventar"
@@ -147,23 +148,39 @@ def build_ass(story: dict, start_werte: dict, events: list[dict], total: float, 
                 v = round(v) if numeric else v
                 t0 = ev["t"] + k * STEP_S
                 t1 = ev["t"] + (k + 1) * STEP_S if numeric else ev["t"] + TICK_S
-                lines.append(_ev(1, t0, t1, "HUD",
+                hud_lines.append((1, t0, t1, "HUD",
                                  f"{pos}{{\\c{col}\\fscx108\\fscy108}}{label}: {esc(fmt_value(d, v))}"))
             # Nachleuchten, dann normal
             glow_end = ev["t"] + TICK_S + 0.6
-            lines.append(_ev(1, ev["t"] + TICK_S, glow_end, "HUD",
+            hud_lines.append((1, ev["t"] + TICK_S, glow_end, "HUD",
                              f"{pos}{{\\c{col}\\t(0,600,\\c&H00FFFFFF&)}}{label}: {esc(fmt_value(d, ev['nachher']))}"))
             # Delta-Pop-up steigt neben der Zeile auf
             delta = esc(fmt_delta(d, ev["vorher"], ev["nachher"]))
             src = f"  {esc(ev['quelle'])}" if ev.get("quelle") else ""
             px = HUD_X + 560
-            lines.append(_ev(2, ev["t"], ev["t"] + 1.6, "Pop",
+            hud_lines.append((2, ev["t"], ev["t"] + 1.6, "Pop",
                              f"{{\\move({px},{y},{px},{y - 60})\\fad(100,500)\\c{col}}}{delta}{src}"))
             cur_t, cur_v = glow_end, ev["nachher"]
-        lines.append(_ev(1, cur_t, total, "HUD", f"{pos}{label}: {esc(fmt_value(d, cur_v))}"))
+        hud_lines.append((1, cur_t, total, "HUD", f"{pos}{label}: {esc(fmt_value(d, cur_v))}"))
+
+    # Statusanzeige nur am Anfang und kurz nach jeder Änderung einblenden (keine Dauer-Überlagerung)
+    wins = [(0.0, 3.0)] + [(e["t"] - 0.2, e["t"] + 3.5) for e in events]
+    wins.sort()
+    merged: list[list[float]] = []
+    for w0, w1 in wins:
+        if merged and w0 <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], w1)
+        else:
+            merged.append([w0, w1])
+    for layer, t0, t1, style, text in hud_lines:
+        for w0, w1 in merged:
+            a0, a1 = max(t0, w0), min(t1, w1)
+            if a1 - a0 > 0.01:
+                fade = "{\\fad(150,250)}" if (abs(a0 - w0) < 0.02 or abs(a1 - w1) < 0.02) and layer == 1 else ""
+                lines.append(_ev(layer, a0, a1, style, fade + text))
 
     # Titel (erste 3 s)
-    lines.append(_ev(3, 0.2, 3.2, "Titel", f"{{\\pos({W // 2},{HUD_Y + len(rows) * ROW_H + 40})\\fad(250,400)}}"
+    lines.append(_ev(3, 0.2, 2.7, "Titel", f"{{\\pos({W // 2},{HUD_Y + len(rows) * ROW_H + 40})\\fad(250,400)}}"
                      f"{esc(story['titel'])}\\N{{\\fs40}}{esc(titel)}"))
 
     # Untertitel

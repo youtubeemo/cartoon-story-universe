@@ -1,147 +1,220 @@
 geschichte: die-letzten-10000
 teil: 1
 titel: "Das Erbe mit Haken"
-# Zeiten: Jede Szene dauert „dauer“ Sekunden. Sprechtext wird nacheinander gesprochen
-# (erst Erzähler, dann Dialog). Ist der echte Ton länger, verlängert der Schnitt die Szene.
-# HUD-Ereignisse: „zu“ = neuer Wert, „delta“ = Änderung. Der Startwert kommt aus state/<slug>.json.
+# STORYBOARD v2 – verbindliches Format (siehe docs/STILBIBEL.md):
+#   nr, ort, figuren, ansicht (optional, Standard dreiviertel), tageszeit, handlung (deutsch, was passiert und warum),
+#   bild (englisch, Startbild/Komposition), kamera, kamerabewegung, bewegung (englisch, konkrete Aktion),
+#   uebergang (schnitt | anschluss | ueberblendung | abblende), dauer (4/6/8 s),
+#   erzaehler / dialog / sfx / hud optional. Keine @-Tags – Figuren und Ort kommen aus den Feldern.
 
 szenen:
-  - id: S01
-    dauer: 5
+  - nr: 1
     ort: strasse
-    kamera: "Schnelle seitliche Fahrt neben Jonas auf dem Rad"
-    keyframe_prompt: "@jonas racing on a bicycle down the cobblestone street of @strasse, leaning forward, jacket flapping, leaves swirling"
-    motion_prompt: "The young man pedals fast down the street, swerves around a pigeon, camera tracks alongside him"
+    figuren: [jonas]
+    ansicht: {jonas: seite}
+    tageszeit: morgen
+    handlung: "Jonas fährt als Kurier durch die Altstadt – pleite, aber gut gelaunt."
+    bild: "Jonas on his bicycle in the middle of the cobblestone street, side view, shops behind him"
+    kamera: halbtotale
+    kamerabewegung: begleitfahrt
+    bewegung: "Jonas pedals energetically along the street, his backpack bouncing, he rings his bell and grins"
+    uebergang: abblende
+    dauer: 6
     erzaehler: "Jonas hat genau null Euro auf dem Konto. Bis heute."
-    sfx: [{prompt: "bicycle bell ring and fast bicycle wheels on cobblestones", dauer: 3, at: 0.2}]
+    sfx: [{prompt: "bicycle bell ring and bicycle wheels on cobblestones", dauer: 3, at: 0.5}]
 
-  - id: S02
-    dauer: 5
+  - nr: 2
     ort: backstube
-    kamera: "Langsamer Push-in auf den Brief in Jonas' Händen"
-    keyframe_prompt: "@jonas standing at the glass counter of @backstube, holding an open letter with both hands, eyes wide"
-    motion_prompt: "He unfolds the letter, reads, his eyes grow huge, camera pushes in slowly"
+    figuren: [jonas]
+    tageszeit: morgen
+    handlung: "In Omas Bäckerei öffnet Jonas den Brief vom Notar und liest von seinem Erbe."
+    bild: "Jonas standing behind the glass counter holding a closed envelope with both hands"
+    kamera: halbtotale
+    kamerabewegung: ranfahrt
+    bewegung: "Jonas tears open the envelope, unfolds the letter, reads it and his eyes go wide with surprise"
+    uebergang: schnitt
+    dauer: 6
     erzaehler: "Oma Edith hat ihm alles vererbt: zehntausend Euro."
     hud: [{key: geld, zu: 10000}]
-    sfx: [{prompt: "paper letter unfolding, then a bright cash register ding", dauer: 2, at: 1.5}]
+    sfx: [{prompt: "paper envelope tearing and letter unfolding", dauer: 2, at: 0.5}]
 
-  - id: S03
-    dauer: 5
+  - nr: 3
     ort: backstube
-    kamera: "Halbtotale, Jonas springt jubelnd, Aylin im Vordergrund unscharf"
-    keyframe_prompt: "@jonas jumping with joy in @backstube while @aylin in the foreground crosses her arms, unimpressed"
-    motion_prompt: "He jumps and cheers with both fists up, she rolls her eyes and points at the letter"
+    figuren: [jonas, aylin]
+    tageszeit: morgen
+    handlung: "Jonas jubelt, Aylin bleibt skeptisch und zeigt auf das zweite Blatt."
+    bild: "Jonas and Aylin standing side by side behind the counter, Jonas holding the letter up"
+    kamera: halbnah
+    kamerabewegung: statisch
+    bewegung: "Jonas jumps and throws both fists in the air cheering, Aylin crosses her arms and points at the letter"
+    uebergang: schnitt
+    dauer: 6
     dialog:
       - {figur: jonas, text: "Zehntausend! Ich bin reich!"}
       - {figur: aylin, text: "Lies weiter."}
 
-  - id: S04
-    dauer: 5
+  - nr: 4
     ort: backstube
-    kamera: "Detail: zweites Blatt mit rotem Stempel, dann Reißschwenk auf Jonas' Gesicht"
-    keyframe_prompt: "Close-up of @jonas holding a second sheet of paper with a big red stamp shape, his face turning pale in @backstube"
-    motion_prompt: "Whip pan from the red stamped paper to his shocked face, his smile collapses"
+    figuren: [jonas, aylin]
+    tageszeit: morgen
+    handlung: "Jonas liest das zweite Blatt – die Bäckerei hat hohe Schulden. Seine Freude kippt."
+    bild: "Jonas and Aylin behind the counter, Jonas looking down at the letter"
+    kamera: halbnah
+    kamerabewegung: statisch
+    bewegung: "Jonas flips to the second page, his smile slowly drops, his shoulders sag, Aylin puts a hand on his shoulder"
+    uebergang: anschluss
+    dauer: 6
     erzaehler: "Und ihre Bäckerei. Mit achtzehntausend Euro Schulden."
-    sfx: [{prompt: "comedic descending trombone wah wah", dauer: 2, at: 2.5}]
+    sfx: [{prompt: "comedic sad descending trombone", dauer: 2, at: 3.0}]
 
-  - id: S05
-    dauer: 5
+  - nr: 5
     ort: bank
-    kamera: "Totale, die große Wanduhr tickt im Vordergrund"
-    keyframe_prompt: "@jonas sitting small on a chair in front of a huge grey desk in @bank, a giant wall clock looming behind"
-    motion_prompt: "The clock hand ticks forward, he shrinks into the chair, camera slowly dollies back"
+    figuren: [jonas]
+    tageszeit: tag
+    handlung: "Bei der Bank erfährt Jonas die Frist: dreißig Tage bis zur Pfändung."
+    bild: "Jonas sitting small on a chair in front of a huge grey desk, a large wall clock behind the desk"
+    kamera: totale
+    kamerabewegung: statisch
+    bewegung: "Jonas nervously fidgets on the chair and sinks lower while the clock hand ticks forward"
+    uebergang: ueberblendung
+    dauer: 6
     erzaehler: "Die Bank gibt ihm dreißig Tage. Dann wird gepfändet."
     sfx: [{prompt: "loud old wall clock ticking", dauer: 4, at: 0.5}]
 
-  - id: S06
-    dauer: 5
+  - nr: 6
     ort: strasse
-    kamera: "Untersicht, lila Limousine hält vor der Bäckerei"
-    keyframe_prompt: "A shiny purple limousine stopping in front of the bakery in @strasse, @grell stepping out, low angle"
-    motion_prompt: "The limousine glides to a stop, the door opens and the thin man in the purple suit steps out grinning"
-    erzaehler: "Und dann taucht Herr Grell auf."
-    sfx: [{prompt: "luxury car braking softly, car door closing", dauer: 3, at: 0.3}]
+    figuren: [grell]
+    ansicht: {grell: vorne}
+    tageszeit: tag
+    handlung: "Vor der Bäckerei steigt Immobilienhai Grell aus seiner Limousine."
+    bild: "Grell standing next to a shiny purple limousine in front of the bakery, adjusting his tie"
+    kamera: untersicht
+    kamerabewegung: statisch
+    bewegung: "Grell closes the car door, straightens his tie and walks towards the bakery with a smug grin"
+    uebergang: schnitt
+    dauer: 4
+    erzaehler: "Dann kommt Herr Grell."
+    sfx: [{prompt: "car door closing", dauer: 1, at: 0.4}]
 
-  - id: S07
-    dauer: 6
+  - nr: 7
     ort: backstube
-    kamera: "Grell beugt sich über die Theke, Kamera kippt leicht"
-    keyframe_prompt: "@grell leaning over the glass counter of @backstube toward @jonas, twirling a gold fountain pen"
-    motion_prompt: "He leans in, twirls the gold pen and taps it on a contract, dutch tilt camera"
+    figuren: [grell, jonas]
+    tageszeit: tag
+    handlung: "Grell bietet Jonas einen Spottpreis für den Laden an."
+    bild: "Grell leaning over the counter towards Jonas, holding a gold pen and a contract"
+    kamera: halbnah
+    kamerabewegung: statisch
+    bewegung: "Grell slides the contract across the counter and taps it with his gold pen, Jonas leans back"
+    uebergang: schnitt
+    dauer: 6
     dialog:
       - {figur: grell, text: "Ich kaufe den Laden. Fünftausend Euro. Heute."}
 
-  - id: S08
-    dauer: 5
+  - nr: 8
     ort: backstube
-    kamera: "Schuss-Gegenschuss, Aylin stemmt die Hände in die Hüften"
-    keyframe_prompt: "@aylin with hands on hips glaring at @grell inside the bakery, @jonas standing between them"
-    motion_prompt: "She steps forward angrily, flour puffs from her apron, he looks back and forth"
+    figuren: [aylin, grell]
+    tageszeit: tag
+    handlung: "Aylin stellt sich Grell entgegen."
+    bild: "Aylin stepping between the counter and Grell, hands on her hips, Grell in front of her"
+    kamera: ueber_schulter
+    kamerabewegung: statisch
+    bewegung: "Aylin steps forward angrily, a puff of flour rises from her apron, Grell raises an eyebrow"
+    uebergang: schnitt
+    dauer: 4
     dialog:
       - {figur: aylin, text: "Der Laden ist das Zehnfache wert!"}
 
-  - id: S09
-    dauer: 5
+  - nr: 9
     ort: backstube
-    kamera: "Aufsicht auf die Theke, Scheine fliegen davon"
-    keyframe_prompt: "@jonas at the counter of @backstube handing banknotes to a delivery man holding flour sacks, top-down view"
-    motion_prompt: "Banknotes flutter out of his hands one by one, flour sacks are stacked, camera rotates slightly"
-    erzaehler: "Erste Rechnung: Mehl und Strom. Fünfzehnhundert Euro."
+    figuren: [jonas]
+    tageszeit: tag
+    handlung: "Jonas bezahlt die ersten offenen Rechnungen."
+    bild: "Jonas at the counter with a pile of bills and banknotes, a cash register next to him"
+    kamera: nah
+    kamerabewegung: statisch
+    bewegung: "Jonas counts banknotes into an envelope one by one and sighs as the pile gets smaller"
+    uebergang: schnitt
+    dauer: 6
+    erzaehler: "Erste Rechnungen: Mehl und Strom. Fünfzehnhundert Euro."
     hud: [{key: geld, delta: -1500}]
-    sfx: [{prompt: "cash register and coins dropping", dauer: 2, at: 1.0}]
+    sfx: [{prompt: "cash register drawer and coins", dauer: 2, at: 1.0}]
 
-  - id: S10
-    dauer: 5
+  - nr: 10
     ort: strasse
-    kamera: "Zeitraffer: Sonne zieht über die Gasse, Schatten wandern"
-    keyframe_prompt: "Time-lapse view of @strasse with the bakery, sun moving across the sky, shadows sweeping"
-    motion_prompt: "Fast time-lapse, clouds race, shadows sweep across the cobblestones, day turns to evening"
+    figuren: []
+    tageszeit: abend
+    handlung: "Der Tag vergeht."
+    bild: "The bakery on the old-town street in warm evening light, street lamps switching on"
+    kamera: totale
+    kamerabewegung: statisch
+    bewegung: "The sun sets quickly, shadows sweep over the cobblestones and the street lamps switch on one by one"
+    uebergang: ueberblendung
+    dauer: 4
     erzaehler: "Ein Tag ist schon weg."
     hud: [{key: tage, delta: -1}]
-    sfx: [{prompt: "fast whoosh time-lapse transition", dauer: 2, at: 0.5}]
 
-  - id: S11
-    dauer: 5
+  - nr: 11
     ort: backstube
-    kamera: "Der Messingofen bebt, Kamera wackelt"
-    keyframe_prompt: "The big brass oven of @backstube shaking violently with steam bursting out, @jonas and @aylin jumping back"
-    motion_prompt: "The oven rattles, the door bursts open with a puff of black smoke, both characters leap back"
-    erzaehler: "Dann gibt der alte Ofen den Geist auf."
-    sfx: [{prompt: "cartoon metal oven rattling then a loud bang and hiss of steam", dauer: 3, at: 1.0}]
-
-  - id: S12
+    figuren: [jonas, aylin]
+    tageszeit: abend
+    handlung: "Der alte Ofen geht mit einem Knall kaputt."
+    bild: "Jonas and Aylin standing in front of the big brass oven, evening light"
+    kamera: halbtotale
+    kamerabewegung: statisch
+    bewegung: "The oven shakes, its door bursts open with a puff of black smoke and both jump back startled"
+    uebergang: schnitt
     dauer: 6
+    erzaehler: "Dann gibt der alte Ofen den Geist auf."
+    sfx: [{prompt: "cartoon metal rattling then a loud bang and hiss of steam", dauer: 3, at: 1.0}]
+
+  - nr: 12
     ort: backstube
-    kamera: "Zweier-Einstellung, beide rußverschmiert"
-    keyframe_prompt: "@jonas and @aylin covered in soot in front of the broken oven in @backstube, looking at each other"
-    motion_prompt: "They cough, wipe soot from their faces and look at each other in despair"
+    figuren: [jonas, aylin]
+    tageszeit: abend
+    handlung: "Rußverschmiert erkennen beide das Problem."
+    bild: "Jonas and Aylin in front of the broken oven, faces covered in soot"
+    kamera: halbtotale
+    kamerabewegung: statisch
+    bewegung: "Aylin coughs and wipes soot off her face, Jonas looks at her and shrugs helplessly"
+    uebergang: anschluss
+    dauer: 6
     dialog:
       - {figur: aylin, text: "Ohne Ofen kein Brot. Ohne Brot kein Geld."}
       - {figur: jonas, text: "Und ohne Geld kein Ofen."}
 
-  - id: S13
-    dauer: 5
+  - nr: 13
     ort: strasse
-    kamera: "Durch das Schaufenster: Grell lächelt draußen, Visitenkarte rutscht unter der Tür durch"
-    keyframe_prompt: "@grell outside the bakery window at night in @strasse, smiling, sliding a business card under the door"
-    motion_prompt: "He slides a card under the door, taps the window with his pen and walks off into the night"
+    figuren: [grell]
+    tageszeit: nacht
+    handlung: "Grell schiebt nachts seine Karte unter der Tür durch."
+    bild: "Grell outside the bakery door at night under a street lamp, bending down with a business card"
+    kamera: halbnah
+    kamerabewegung: statisch
+    bewegung: "Grell slides a business card under the door, straightens up, taps the window and walks away"
+    uebergang: ueberblendung
+    dauer: 4
     dialog:
       - {figur: grell, text: "Mein Angebot gilt bis Mitternacht."}
 
-  - id: S14
-    dauer: 9
+  - nr: 14
     ort: backstube
-    kamera: "Langsame Kreisfahrt um Jonas, der die Karte anstarrt"
-    keyframe_prompt: "@jonas alone in the dark @backstube holding a business card, the broken oven behind him, moonlight"
-    motion_prompt: "Slow orbit around him as he stares at the card, a clock ticks, he looks up at the camera"
+    figuren: [jonas]
+    tageszeit: nacht
+    handlung: "Jonas hält Grells Karte in der Hand und muss sich entscheiden."
+    bild: "Jonas alone in the dark bakery holding a business card, the broken oven behind him, moonlight"
+    kamera: nah
+    kamerabewegung: ranfahrt
+    bewegung: "Jonas turns the card in his fingers, looks at the broken oven, then looks up thoughtfully"
+    uebergang: schnitt
+    dauer: 8
     erzaehler: "Was soll Jonas tun? Eins, zwei oder drei? Schreib es in die Kommentare!"
     entscheidung: true
-    sfx: [{prompt: "suspense riser ending in a single dramatic hit", dauer: 5, at: 3.5}]
+    sfx: [{prompt: "soft suspense riser ending in a single hit", dauer: 5, at: 3.0}]
 
 entscheidung:
   frage: "Was soll Jonas tun?"
   optionen:
     1: {text: "Neuen Ofen kaufen (4.000 €)", effekte: {geld: -4000}}
-    2: {text: "Mit Aylin selbst reparieren (600 €, 2 Tage)", effekte: {geld: -600, tage: -2}}
-    3: {text: "Zur Bank: Aufschub verhandeln (1 Tag)", effekte: {tage: -1}}
-  standard: 2     # gilt, wenn keine zuverlässigen Stimmen vorliegen oder bei Gleichstand
+    2: {text: "Mit Aylin reparieren (600 €, 2 Tage)", effekte: {geld: -600, tage: -2}}
+    3: {text: "Zur Bank: Aufschub (1 Tag)", effekte: {tage: -1}}
+  standard: 2

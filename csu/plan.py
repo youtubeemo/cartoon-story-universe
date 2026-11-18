@@ -1,17 +1,21 @@
-"""Auftragsplan einer Folge (reine Daten, sendet nichts) + Kostenschätzung.
+"""Auftragspläne (reine Daten, sendet nichts) + Kostenschätzung.
 
-Nutzt die geprüften Bausteine aus storyhouse-originals: Job, Preistabelle, Spezifikationsprüfung.
-Abgenommene Referenzbilder (assets/refs/<slug>/<tag>.png) und die Musik je Geschichte
-(assets/music/<slug>.mp3) werden wiederverwendet – sie kosten nur beim allerersten Mal.
+Drei Phasen, jede mit eigener Freigabe:
+  vorlagen    – Charaktervorlagen (vorne/seite/dreiviertel) und Ortsbilder, einmal je Geschichte
+  storyboard  – ein Startbild je Szene (nur bei schnitt/ueberblendung/abblende), aus freigegebenen Vorlagen
+  animation   – Bewegung je Szene aus freigegebenem Storyboard, Stimmen, SFX, Musik
+
+Abgenommene Dateien (Vorlagen, Storyboard-Bilder, Musik) werden als „eingefroren“ übergeben und kosten 0 €.
 """
 from __future__ import annotations
 
-import hashlib
 import zlib
 from dataclasses import dataclass, field
+from pathlib import Path
 
-from csu.common import MUSIC, REFS, budget, production, storyhouse_import
-from csu.validate import ref_sources, tags_in
+from csu.common import MUSIC, budget, production, storyhouse_import
+from csu.freigabe import freigegebene_vorlagen
+from csu.validate import VIEW_SUFFIX, ref_tag, scene_refs, stil
 
 storyhouse_import()
 from storyhouse import elevenlabs_spec as el_spec  # noqa: E402
@@ -20,7 +24,6 @@ from storyhouse.plan import Job  # noqa: E402
 from storyhouse.runway_spec import snap_duration  # noqa: E402
 
 IMAGE_RATIO = "1080:1920"
-MAX_REFS = 3
 
 
 def _seed(key: str) -> int:
@@ -36,8 +39,9 @@ class EpisodePlan:
     slug: str
     teil: int
     profil: str
+    phase: str
     jobs: list = field(default_factory=list)
-    frozen_refs: dict = field(default_factory=dict)   # Job-ID -> Pfad (0 €)
+    frozen_refs: dict = field(default_factory=dict)   # Job-ID -> Pfad (0 €): Vorlagen, Storyboard-Bilder
     musik_datei: str | None = None
     notes: list = field(default_factory=list)
 
@@ -74,62 +78,132 @@ def speech_items(story: dict, scene: dict) -> list[dict]:
     return out
 
 
-def build_plan(story: dict, ep: dict, pricing: Pricing, profil: str | None = None) -> EpisodePlan:
+# ------------------------------------------------------------------ Phase 1: Vorlagen
+def vorlagen_jobs(story: dict, pricing: Pricing, profil: str | None = None) -> EpisodePlan:
+    st = stil()
+    prof = pricing.profile(profil or production().get("profil", "qualitaet"))
+    model = prof["reference_image_model"]
+    plan = EpisodePlan(slug=story["slug"], teil=0, profil=profil or production().get("profil"), phase="vorlagen")
+    look, avoid = _clean(st["look_kurz"]), _clean(st["verboten"])
+    for key, fig in story["figuren"].items():
+        base = _clean(fig["reference_prompt"])
+        vorne = ref_tag(key, "vorne")
+        plan.jobs.append(Job(id=f"REF_{vorne}", kind="image", model=model, ext="png",
+                             credits=pricing.image_credits(model),
+                             payload={"model": model, "ratio": IMAGE_RATIO, "seed": _seed(f"{story['slug']}-{vorne}"),
+                                      "promptText": _clean(f"Character design sheet of {fig['name']}: {base} "
+                                                           f"{st['ansichten']['vorne']}. {st['vorlage_hintergrund']}. "
+                                                           f"{look} Avoid: {avoid}")[:1000]}))
+        for ansicht in ("seite", "dreiviertel"):
+            tag = ref_tag(key, ansicht)
+            plan.jobs.append(Job(
+                id=f"REF_{tag}", kind="image", model=model, ext="png", credits=pricing.image_credits(model),
+                depends=[f"REF_{vorne}"],
+                payload={"model": model, "ratio": IMAGE_RATIO, "seed": _seed(f"{story['slug']}-{tag}"),
+                         "referenceImages": [{"uri": f"{{{{out:REF_{vorne}}}}}", "tag": vorne}],
+                         "promptText": _clean(f"The exact same character as @{vorne}, identical design, colors, "
+                                              f"proportions and outfit, {st['ansichten'][ansicht]}. "
+                                              f"{st['vorlage_hintergrund']}. {look}")[:1000]}))
+    for key, ort in story["orte"].items():
+        plan.jobs.append(Job(id=f"REF_{key[:16]}", kind="image", model=model, ext="png",
+                             credits=pricing.image_credits(model),
+                             payload={"model": model, "ratio": IMAGE_RATIO, "seed": _seed(f"{story['slug']}-{key}"),
+                                      "promptText": _clean(f"Background layout, no characters: {ort['reference_prompt']} "
+                                                           f"{look} Avoid: {avoid}")[:1000]}))
+    return plan
+
+
+def vorlagen_tags(story: dict) -> list[str]:
+    tags = [ref_tag(k, a) for k in story["figuren"] for a in VIEW_SUFFIX]
+    return tags + [k[:16] for k in story["orte"]]
+
+
+# ------------------------------------------------------------------ Phase 2+3: Storyboard und Animation
+def _kf_prompt(story: dict, s: dict) -> str:
+    st = stil()
+    refs = scene_refs(story, s)
+    who = "; ".join(f"@{t} is {d}" for t, d in refs if not d.startswith("Ort"))
+    where = next((f"Location: @{t}." for t, d in refs if d.startswith("Ort")), "")
+    return _clean(f"{s['bild']}. {st['kamera'][s['kamera']]}. {st['tageszeit'][s['tageszeit']]}. "
+                  f"{('Characters: ' + who + '.') if who else 'No characters.'} {where} "
+                  f"Exactly these characters, no others. {st['look_kurz']} Avoid: {st['verboten']}")[:1000]
+
+
+def _vid_prompt(s: dict) -> str:
+    st = stil()
+    talk = st["sprechen"] if s.get("dialog") else ""
+    return _clean(f"{s['bewegung']}. Camera: {st['kamerabewegung'][s['kamerabewegung']]}. {talk} "
+                  f"{st['bewegung']}")[:1000]
+
+
+def build_plan(story: dict, ep: dict, pricing: Pricing, profil: str | None = None, phase: str = "animation",
+               storyboard: dict[str, str] | None = None, schaetzung: bool = False) -> EpisodePlan:
+    """phase storyboard: nur Startbilder. phase animation: alles außer bereits freigegebenen Startbildern."""
     prod = production()
-    profil = profil or prod.get("profil", "test")
+    profil = profil or prod.get("profil", "qualitaet")
     prof = pricing.profile(profil)
-    style, motion_style = _clean(prod["stil"]["global"]), _clean(prod["stil"]["bewegung"])
     slug = story["slug"]
-    plan = EpisodePlan(slug=slug, teil=int(ep["teil"]), profil=profil)
-    sources = ref_sources(story)
+    plan = EpisodePlan(slug=slug, teil=int(ep["teil"]), profil=profil, phase=phase)
+    vorlagen = freigegebene_vorlagen(slug)
+    storyboard = storyboard or {}
 
     def add(job: Job) -> None:
         job.validate()
         plan.jobs.append(job)
 
-    # 1) Referenzbilder (Figuren + Orte) – nur, wenn noch kein abgenommenes Bild im Repo liegt
-    needed = []
-    for s in ep["szenen"]:
-        for t in tags_in(s["keyframe_prompt"])[:MAX_REFS]:
-            if t not in needed:
-                needed.append(t)
-    ref_id = {}
-    for tag in needed:
-        frozen = REFS / slug / f"{tag}.png"
-        if frozen.exists():
-            ref_id[tag] = f"REF_{tag}_{hashlib.sha256(frozen.read_bytes()).hexdigest()[:8]}"
-            plan.frozen_refs[ref_id[tag]] = str(frozen)
+    for tag, path in vorlagen.items():
+        plan.frozen_refs[f"REF_{tag}"] = path
+    scenes = ep["szenen"]
+    needed = {t for s in scenes if s["uebergang"] != "anschluss" for t, _ in scene_refs(story, s)}
+    missing = sorted(needed - set(vorlagen))
+    if schaetzung:              # nur Kostenschätzung: fehlende Vorlagen/Startbilder als vorhanden annehmen
+        for t in missing:
+            plan.frozen_refs[f"REF_{t}"] = "(Schätzung)"
+        missing = []
+    if missing:
+        raise ValueError(f"Nicht freigegebene/fehlende Vorlagen: {', '.join(missing)} – erst Phase „vorlagen“")
+
+    # Startbilder je Szene (anschluss-Szenen beginnen mit dem letzten Bild der vorigen Szene)
+    for s in scenes:
+        if s["uebergang"] == "anschluss":
             continue
-        ref_id[tag] = f"REF_{tag}"
-        model = prof["reference_image_model"]
-        add(Job(id=ref_id[tag], kind="image", model=model, ext="png", credits=pricing.image_credits(model),
-                payload={"model": model, "promptText": _clean(f"{sources[tag]} {style}")[:1000],
-                         "ratio": IMAGE_RATIO, "seed": _seed(f"{slug}-ref-{tag}")}))
-    if plan.frozen_refs:
-        plan.notes.append(f"{len(plan.frozen_refs)} Referenzbilder aus dem Repo wiederverwendet (0 €)")
+        kid = f"KF_{s['id']}"
+        if kid in storyboard:
+            plan.frozen_refs[kid] = storyboard[kid]
+            continue
+        if phase == "animation" and schaetzung:
+            plan.frozen_refs[kid] = "(Schätzung)"
+            continue
+        if phase == "animation":
+            raise ValueError(f"{kid}: kein freigegebenes Storyboard-Bild – erst Phase „storyboard“")
+        refs = [{"uri": f"{{{{out:REF_{t}}}}}", "tag": t} for t, _ in scene_refs(story, s)]
+        model = prof["keyframe_model"]
+        add(Job(id=kid, kind="image", model=model, scene=s["id"], ext="png", credits=pricing.image_credits(model),
+                payload={"model": model, "promptText": _kf_prompt(story, s), "ratio": IMAGE_RATIO,
+                         "referenceImages": refs, "seed": _seed(f"{slug}-{ep['teil']}-kf-{s['id']}")}))
+    if phase == "storyboard":
+        return plan
 
-    # 2) Keyframes + 3) Bewegtbild je Szene
-    for s in ep["szenen"]:
-        tags = tags_in(s["keyframe_prompt"])[:MAX_REFS]
-        refs = [{"uri": f"{{{{out:{ref_id[t]}}}}}", "tag": t} for t in tags]
-        model = prof["keyframe_model"] if refs else prof["reference_image_model"]  # *_turbo braucht Referenzen
-        add(Job(id=f"KF_{s['id']}", kind="image", model=model, scene=s["id"], ext="png",
-                credits=pricing.image_credits(model),
-                depends=[ref_id[t] for t in tags if ref_id[t] not in plan.frozen_refs],
-                payload={"model": model, "promptText": _clean(f"{s['keyframe_prompt']} {style}")[:1000],
-                         "ratio": IMAGE_RATIO, **({"referenceImages": refs} if refs else {}),
-                         "seed": _seed(f"{slug}-{ep['teil']}-kf-{s['id']}")}))
-        vmodel = prof["video_model"]
+    # Bewegung je Szene
+    vmodel = prof["video_model"]
+    ratio = prod["video"]["generierung_ratio"][vmodel]
+    prev = None
+    for s in scenes:
+        first = f"{{{{out:LF_VID_{prev['id']}}}}}" if s["uebergang"] == "anschluss" else f"{{{{out:KF_{s['id']}}}}}"
         dur = snap_duration(vmodel, float(s["dauer"]))
+        payload = {"model": vmodel, "promptText": _vid_prompt(s), "ratio": ratio, "duration": dur,
+                   "seed": _seed(f"{slug}-{ep['teil']}-vid-{s['id']}")}
+        payload["promptImage"] = [{"uri": first, "position": "first"}] if vmodel.startswith("veo") else first
+        if vmodel.startswith("veo"):
+            payload["audio"] = False          # Ton kommt von ElevenLabs
         add(Job(id=f"VID_{s['id']}", kind="video", model=vmodel, scene=s["id"], ext="mp4",
-                credits=pricing.video_credits(vmodel, dur), depends=[f"KF_{s['id']}"],
-                payload={"model": vmodel, "promptImage": f"{{{{out:KF_{s['id']}}}}}",
-                         "promptText": _clean(f"{s['motion_prompt']}. {motion_style}")[:1000],
-                         "ratio": prod["video"]["generierung_ratio"], "duration": dur,
-                         "seed": _seed(f"{slug}-{ep['teil']}-vid-{s['id']}")}))
+                credits=pricing.video_credits(vmodel, dur),
+                depends=[f"VID_{prev['id']}"] if s["uebergang"] == "anschluss" else [],
+                payload=payload))
+        prev = s
 
-    # 4) Stimmen (ElevenLabs) – Erzähler + Figuren
-    for s in ep["szenen"]:
+    # Stimmen, Soundeffekte (ElevenLabs, im Abo)
+    for s in scenes:
         for it in speech_items(story, s):
             v = it["voice"]
             model = v.get("model") or pricing.elevenlabs_model("tts")
@@ -141,7 +215,6 @@ def build_plan(story: dict, ep: dict, pricing: Pricing, profil: str | None = Non
             add(Job(id=it["id"], kind="tts", model=model, scene=s["id"], ext="mp3", provider="elevenlabs",
                     path=el_spec.tts_path(str(v["voice_id"])), credits=pricing.el_tts_credits(model, it["text"]),
                     payload=body))
-        # 5) Soundeffekte
         sfx_model = pricing.elevenlabs_model("sfx")
         for i, fx in enumerate(s.get("sfx") or []):
             add(Job(id=f"SFX_{s['id']}_{i + 1}", kind="sfx", model=sfx_model, scene=s["id"], ext="mp3",
@@ -150,7 +223,6 @@ def build_plan(story: dict, ep: dict, pricing: Pricing, profil: str | None = Non
                     payload={"text": _clean(fx["prompt"]), "model_id": sfx_model,
                              "duration_seconds": float(fx["dauer"]), "loop": False, "prompt_influence": 0.4}))
 
-    # 6) Musik – einmal je Geschichte, danach aus dem Repo
     music = MUSIC / f"{slug}.mp3"
     if music.exists():
         plan.musik_datei = str(music)
@@ -161,12 +233,17 @@ def build_plan(story: dict, ep: dict, pricing: Pricing, profil: str | None = Non
                 payload={"prompt": _clean(story["musik"]), "model_id": mm, "music_length_ms": 90000,
                          "force_instrumental": True}))
         plan.notes.append("Musik wird einmalig erzeugt und danach wiederverwendet")
-    else:
-        plan.notes.append("Keine Musik: Lizenzprüfung Eleven Music offen (budget.yaml) und keine Datei in assets/music/")
     return plan
 
 
 def estimate(plan: EpisodePlan, pricing: Pricing, cfg: BudgetConfig) -> dict:
     eur = plan.eur(pricing, cfg)
+    rw = pricing.credits_to_eur(plan.credits("runway"), cfg, "runway")
     return {"runway_credits": round(plan.credits("runway")), "elevenlabs_credits": round(plan.credits("elevenlabs")),
-            "eur": round(eur, 2), "eur_mit_puffer": round(with_margin(eur, cfg), 2), "auftraege": len(plan.jobs)}
+            "runway_eur": round(rw, 2), "eur": round(eur, 2), "eur_mit_puffer": round(with_margin(eur, cfg), 2),
+            "auftraege": len(plan.jobs)}
+
+
+def storyboard_dir(slug: str, teil: int) -> Path:
+    from csu.common import ROOT
+    return ROOT / "assets" / "storyboards" / slug / f"teil-{teil:02d}"

@@ -4,8 +4,9 @@ Automatische Produktion interaktiver 2D-Cartoon-Kurzvideos (9:16, 1080 × 1920, 
 Jeden Tag eine Folge, Mo–So je eine andere Geschichte; die Zuschauer entscheiden per Kommentar (1, 2 oder 3),
 wie es weitergeht. Fertige Videos kommen als **direkter MP4-Download** (GitHub-Release, kein ZIP).
 
-**Status:** vorbereitet, täglicher Zeitplan aktiv, **alle kostenpflichtigen Schritte gesperrt** (`config/budget.yaml`).
-Es wurde noch kein Video gerendert und kein Cent ausgegeben. Monatslimit: 150 €.
+**Status (18.11.2026):** Qualitätsumbau abgeschlossen, **alle kostenpflichtigen Schritte und der Zeitplan sind deaktiviert**.
+Neuer Ablauf: Vorlagen → Storyboard → Animation, jeweils mit Freigabe. Details: [`docs/UMBAU-BERICHT.md`](docs/UMBAU-BERICHT.md),
+Stil: [`docs/STILBIBEL.md`](docs/STILBIBEL.md). Monatslimit: 150 €.
 
 ## Ablauf einer Folge
 

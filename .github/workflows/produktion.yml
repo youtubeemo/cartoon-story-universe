@@ -1,18 +1,26 @@
 # =====================================================================
-#  Tagesvideo produzieren – KOSTENPFLICHTIG (Runway, ElevenLabs, optional Claude-API)
-#
-#  Der Zeitplan ist aktiv. Geld wird nur ausgegeben, wenn config/budget.yaml paid_rendering_enabled: true ist UND
-#    * täglich: taeglich_aktiv: true, oder
-#    * manuell: die Bestätigungsphrase eingegeben wird.
-#  Sonst endet der Lauf nach kostenlosen Prüfungen erfolgreich („keine Produktion, 0 €“).
-#  Zentrale Kasse (csu/kasse.py): Monatslimit, Reservierung vor Beginn, Prüfung vor jedem Aufruf, Protokoll.
-#  Ergebnis: MP4 als GitHub-Release-Datei (direkter Link, kein ZIP), Produktionsbericht, Issue mit Link.
+#  Produktion – KOSTENPFLICHTIG (Runway, ElevenLabs, Claude-API), drei Phasen mit Freigaben:
+#    vorlagen   → Charaktervorlagen einer Geschichte (Bogen zur Abnahme)
+#    storyboard → Startbilder je Szene + KI-Bildprüfung (Bogen zur Abnahme)
+#    animation  → nur mit freigegebenem Storyboard: Video, Ton, Schnitt, Qualitätskontrolle, MP4-Release
+#    auto       → täglicher Betrieb (animiert Freigegebenes, sonst Storyboard für heute)
+#  Läuft nur mit paid_rendering_enabled: true UND (Bestätigungsphrase oder taeglich_aktiv: true).
+#  Zentrale Kasse (csu/kasse.py): Monatslimit 150 €, Reservierung vor Beginn, Prüfung vor jedem Aufruf.
 # =====================================================================
 name: Tagesvideo produzieren
 
 on:
   workflow_dispatch:
     inputs:
+      phase:
+        description: "vorlagen | storyboard | animation | auto"
+        required: true
+        type: choice
+        options: [storyboard, animation, vorlagen, auto]
+      geschichte:
+        description: "Geschichte (Slug), leer = Geschichte des Tages"
+        required: false
+        type: string
       bestaetigung:
         description: "Bestätigungsphrase (config/budget.yaml → approval_phrase)"
         required: false
@@ -22,33 +30,31 @@ on:
         required: false
         type: string
       youtube_video_id:
-        description: "YouTube-ID der Vorfolge (für die Abstimmung, optional)"
+        description: "YouTube-ID der Vorfolge (Abstimmung, optional)"
         required: false
         type: string
       tiktok_stimmen:
         description: "TikTok-Stimmen der Vorfolge, z. B. 1=34,2=12,3=8 (optional)"
         required: false
         type: string
-  # Täglicher Lauf DEAKTIVIERT (18.11.2026, Qualitätsumbau). Erst nach ausdrücklicher Freigabe wieder einkommentieren:
+  # Täglicher Lauf DEAKTIVIERT (18.11.2026, Qualitätsumbau). Erst nach ausdrücklicher Freigabe einkommentieren:
   # schedule:                   # 05:17 Uhr deutscher Zeit: Winter = 04:17 UTC, Sommer = 03:17 UTC
   #   - cron: "17 3 * * *"
   #   - cron: "17 4 * * *"
 
 permissions:
-  contents: write     # Stand + Referenzbilder sichern, Release anlegen
-  issues: write       # Benachrichtigung mit Download-Link
+  contents: write
+  issues: write
 
 concurrency:
   group: produktion
   cancel-in-progress: false
 
 jobs:
-  video:
+  produktion:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-    env:
-      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -72,6 +78,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+          PHASE: ${{ inputs.phase || 'auto' }}
+          GESCHICHTE: ${{ inputs.geschichte }}
           BESTAETIGUNG: ${{ inputs.bestaetigung }}
           DATUM: ${{ inputs.datum }}
           YT_ID: ${{ inputs.youtube_video_id }}
@@ -80,53 +88,34 @@ jobs:
           CSU_GIT_SYNC: "1"
         run: |
           git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
-          TZ=Europe/Berlin python -m csu produzieren --out ausgabe $GEPLANT \
-            --bestaetigung "$BESTAETIGUNG" --datum "${DATUM:-$(TZ=Europe/Berlin date +%F)}" \
-            --youtube-video-id "$YT_ID" --tiktok-stimmen "$TT"
+          TZ=Europe/Berlin python -m csu produzieren --phase "$PHASE" --out ausgabe $GEPLANT \
+            ${GESCHICHTE:+--geschichte "$GESCHICHTE"} --bestaetigung "$BESTAETIGUNG" \
+            --datum "${DATUM:-$(TZ=Europe/Berlin date +%F)}" --youtube-video-id "$YT_ID" --tiktok-stimmen "$TT"
 
-      - name: Stand, Kosten und Referenzbilder sichern
+      - name: Stand, Kosten, Vorlagen und Storyboards sichern
         if: always()
         run: |
-          git config user.name "csu-bot"
-          git config user.email "csu-bot@users.noreply.github.com"
-          git add state assets stories berichte 2>/dev/null || git add state assets stories
-          git diff --cached --quiet || git commit -q -m "Produktion $(date +%F): Stand und Kosten"
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
+          git add state assets stories berichte 2>/dev/null || true
+          git diff --cached --quiet || git commit -q -m "Produktion $(date +%F): Stand, Kosten, Ergebnisse"
           git push -q || echo "Push fehlgeschlagen – Stand liegt im Log"
 
-      - name: MP4 als Release veröffentlichen (direkter Download)
+      - name: Ergebnis als Release (direkter Download, kein ZIP)
         id: release
         if: success() && hashFiles('ausgabe/release.json') != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG=$(jq -r .tag ausgabe/release.json); DATEI=$(jq -r .datei ausgabe/release.json)
-          NAME=$(jq -r .dateiname ausgabe/release.json); TITEL=$(jq -r .titel ausgabe/release.json)
-          cp "$(jq -r .bericht ausgabe/release.json)" notiz.txt
-          gh release create "$TAG" "$DATEI" --title "$TITEL" --notes-file notiz.txt
-          URL="https://github.com/${{ github.repository }}/releases/download/$TAG/$NAME"
-          echo "url=$URL" >> "$GITHUB_OUTPUT"; echo "titel=$TITEL" >> "$GITHUB_OUTPUT"
-
-      - name: Optional – zusätzlicher Link ohne GitHub-Login (Cloudflare R2, 7 Tage gültig)
-        id: r2
-        if: success() && env.R2_BUCKET != '' && steps.release.outputs.url != ''
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-        run: |
-          DATEI=$(jq -r .datei ausgabe/release.json); NAME=$(jq -r .dateiname ausgabe/release.json)
-          aws s3 cp "$DATEI" "s3://$R2_BUCKET/$NAME" --endpoint-url "$R2_ENDPOINT" --content-type video/mp4 --only-show-errors
-          echo "url=$(aws s3 presign "s3://$R2_BUCKET/$NAME" --endpoint-url "$R2_ENDPOINT" --expires-in 604800)" >> "$GITHUB_OUTPUT"
+          R=ausgabe/release.json
+          TAG=$(jq -r .tag $R); TITEL=$(jq -r .titel $R); cp "$(jq -r .bericht $R)" notiz.txt
+          FLAGS=""; [ "$(jq -r .prerelease $R)" = true ] && FLAGS="--prerelease"; [ "$(jq -r .draft $R)" = true ] && FLAGS="--draft"
+          mapfile -t DATEIEN < <(jq -r '.dateien[]' $R)
+          gh release create "$TAG" "${DATEIEN[@]}" --title "$TITEL" --notes-file notiz.txt $FLAGS
+          echo "titel=$TITEL" >> "$GITHUB_OUTPUT"; echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Benachrichtigung (GitHub-App aufs iPhone)
-        if: success() && steps.release.outputs.url != ''
+        if: success() && steps.release.outputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          URL: ${{ steps.release.outputs.url }}
-          R2: ${{ steps.r2.outputs.url }}
           TITEL: ${{ steps.release.outputs.titel }}
-        run: |
-          BODY="$(cat notiz.txt)"
-          [ -n "$R2" ] && BODY="**Ohne Login (7 Tage):** $R2"$'\n\n'"$BODY"
-          gh issue create --title "🎬 $TITEL" --body "$BODY" || true
+        run: gh issue create --title "🎬 $TITEL" --body "$(cat notiz.txt)" || true

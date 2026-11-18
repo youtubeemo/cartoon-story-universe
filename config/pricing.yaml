@@ -77,6 +77,13 @@ elevenlabs:
     music_v1: {credits_per_second: 15, verified: true}
 
 profiles:
+  qualitaet:                 # Cartoon Story Universe ab 18.11.2026: native 1080×1920, Start- UND Endbild je Szene
+    reference_image_model: gen4_image
+    keyframe_model: gen4_image
+    video_model: veo3.1_fast                   # ohne Audio, 10 Credits/s, 1080:1920, Dauer 4/6/8 s
+    loop_video_model: veo3.1_fast
+    tts_model: eleven_v3
+    sfx_model: eleven_text_to_sound_v2
   test:                      # günstiger Testlauf
     reference_image_model: gen4_image          # gen4_image_turbo verlangt Referenzbilder
     keyframe_model: gen4_image_turbo

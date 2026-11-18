@@ -1,0 +1,80 @@
+# =====================================================================
+#  VERBINDLICHE STILBIBEL – maschinenlesbar. Jeder Bild- und Bewegungsprompt wird daraus gebaut.
+#  Menschlich lesbare Fassung: docs/STILBIBEL.md
+# =====================================================================
+
+look: >
+  Simple expressive 2D cartoon, TV-animation style. Clean uniform thick black outlines (same line weight
+  everywhere), flat solid color fills with at most one hard-edged shadow tone, no gradients, no painterly
+  texture, no photorealism, no 3D rendering. Simple readable shapes, big heads, large expressive eyes,
+  clear silhouettes. Backgrounds simplified and slightly desaturated so characters pop. Even, soft lighting.
+  Vertical 9:16 composition with the main action in the center third. No text, letters, signs with writing,
+  subtitles, logos or watermarks.
+
+look_kurz: >                      # Kurzfassung für Prompts (Runway-Limit 1000 Zeichen)
+  Simple 2D cartoon, TV-animation style, uniform thick black outlines, flat solid colors with one hard
+  shadow tone, no gradients, no texture, big expressive eyes, clear silhouettes, simplified background,
+  even soft light, no text.
+
+verboten: >                       # wird als „avoid“-Liste angehängt
+  photorealistic, 3D render, painterly, oil painting, watercolor texture, gradient shading, film grain,
+  lens flare, bokeh, extra fingers, distorted faces, extra characters, crowd, text, letters, captions
+
+palette:                          # globale Farbwelt (Hex) – Figuren zusätzlich mit eigenen Farben in story.yaml
+  kontur: "#1B1B1F"
+  hintergrund_tag: ["#BFE3F0", "#F3E6C8", "#9CC79A"]
+  hintergrund_nacht: ["#2B3A55", "#3E4F6E", "#6C7A99"]
+  akzent: ["#F2B134", "#E4572E", "#2EC4B6"]
+
+ansichten:                        # Charaktervorlagen: drei feste Ansichten je Hauptfigur
+  vorne:       "full body, front view, facing the viewer, neutral standing pose, arms relaxed"
+  seite:       "full body, side profile view facing right, neutral standing pose"
+  dreiviertel: "full body, three-quarter view facing slightly left, neutral standing pose"
+vorlage_hintergrund: "plain flat light grey background, no props, no scenery, character centered"
+
+kamera:                           # Einstellungsgröße (Pflichtfeld je Szene) → feste Prompt-Phrase
+  totale:        "wide establishing shot, whole location visible, characters small"
+  halbtotale:    "medium wide shot, characters full body"
+  halbnah:       "medium shot, characters from the knees up"
+  nah:           "medium close-up, head and shoulders"
+  gross:         "close-up on the face"
+  detail:        "extreme close-up detail shot of the object"
+  ueber_schulter: "over-the-shoulder shot"
+  aufsicht:      "high angle shot looking down"
+  untersicht:    "low angle shot looking up"
+
+kamerabewegung:                   # höchstens EINE Bewegung je Szene, sonst statisch
+  statisch:      "static locked-off camera, the camera does not move"
+  schwenk_links: "slow smooth pan to the left"
+  schwenk_rechts: "slow smooth pan to the right"
+  ranfahrt:      "slow smooth push-in towards the subject"
+  rueckfahrt:    "slow smooth pull-back"
+  begleitfahrt:  "smooth tracking shot following the character at the same speed"
+  neigung_hoch:  "slow tilt up"
+  neigung_runter: "slow tilt down"
+
+bewegung: >                       # wird an jede Bewegungsbeschreibung angehängt
+  Fluid 2D cartoon character animation with clear, deliberate acting that matches the described action,
+  squash and stretch, natural timing. Keep exactly the same character designs, colors and outlines as in
+  the first frame. No scene cuts, no morphing, no new characters, no camera moves other than described.
+
+sprechen: "The speaking character's mouth moves naturally in sync with talking, with matching facial expression."
+
+uebergaenge: [schnitt, anschluss, ueberblendung, abblende]
+# schnitt      = harter Schnitt (neue Einstellung, neues Startbild)
+# anschluss    = Handlung läuft nahtlos weiter: Startbild = letztes Bild der vorigen Szene (gleicher Ort, gleiche Figuren)
+# ueberblendung = Zeitsprung/Ortswechsel mit kurzer Blende über Schwarz (0,4 s)
+# abblende     = Auf-/Abblende aus Schwarz (Folgenanfang, großer Zeitsprung)
+
+tageszeit:
+  morgen: "soft morning light"
+  tag: "bright daylight"
+  abend: "warm orange evening light"
+  nacht: "night, cool blue moonlight"
+
+text_im_bild:                     # Overlay-Regeln (keine unnötigen Textüberlagerungen)
+  titel_sekunden: 2.5
+  statusanzeige: bei_aenderung    # nur am Folgenanfang (3 s) und für 3,5 s nach jeder Änderung
+  untertitel_max_zeichen_zeile: 32
+  untertitel_max_zeilen: 2
+  keine_untertitel_bei_auswahlkarte: true

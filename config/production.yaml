@@ -23,21 +23,17 @@ video:
   hoehe: 1920
   fps: 30
   ziel_sekunden: [60, 90]
-  generierung_ratio: "720:1280"   # Runway rendert 720p, FFmpeg skaliert auf 1080×1920 (Lanczos)
-  crf: 20
-  preset: veryfast
+  generierung_ratio:                # je Videomodell; nur veo3.1* liefert echte 1080×1920
+    veo3.1_fast: "1080:1920"
+    veo3.1: "1080:1920"
+    gen4.5: "720:1280"              # Gen-4-Modelle können maximal 720p (werden hochskaliert)
+    gen4_turbo: "720:1280"
+  crf: 17
+  preset: medium                  # höchste Qualität gewünscht → langsameres, besseres Encoding
   audio_bitrate: 192k
   lautheit_lufs: -14.0
 
-stil:                         # einheitlicher Look – wird an JEDEN Bild-Prompt angehängt
-  global: >
-    High-quality 2D hand-drawn cartoon animation still, feature-film 2D look, clean bold dark-brown ink
-    outlines, cel shading with soft gradient shadows, painterly richly detailed backgrounds, warm saturated
-    palette with teal accents, expressive characters with large eyes and readable silhouettes, dynamic
-    composition, vertical 9:16, no text, no letters, no subtitles, no watermark.
-  bewegung: >
-    Smooth 2D cartoon character animation with squash and stretch, lively secondary motion (hair, cloth),
-    consistent character design, dynamic camera move.
+# Stil: verbindlich in config/stil.yaml (Stilbibel)
 
 sprecher:                     # durchgehender deutscher Erzähler (ElevenLabs, Premade-Stimme „George“)
   voice_id: JBFqnCBsd6RMkjVDRZzb
@@ -45,7 +41,7 @@ sprecher:                     # durchgehender deutscher Erzähler (ElevenLabs, P
   stability: 0.5
 
 
-profil: test                  # test = gen4_image_turbo + gen4_turbo · final = gen4_image + gen4.5
+profil: qualitaet                  # test = gen4_image_turbo + gen4_turbo · final = gen4_image + gen4.5
 
 veroeffentlichung:
   tiktok: false               # nur nach gesonderter Freigabe

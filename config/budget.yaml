@@ -15,12 +15,16 @@ drehbuch_api_aktiv: false
 
 # Zusätzliche Ausgaben pro Kalendermonat (Europe/Berlin) – Abo-Gebühren zählen NICHT dazu.
 monatsbudget_eur: 150
-max_pro_video_eur: 12.00     # harte Grenze je Folge inkl. Aufschlag
+max_pro_video_eur: 14.00     # harte Grenze je Folge inkl. Aufschlag (Profil qualitaet ≈ 10,40 € + 25 %)
 safety_margin: 0.25          # Reservierung = Schätzung × 1,25
 eur_per_usd: 1.00            # bewusst ungünstig (echter Kurs liegt darunter) → deckt Kursschwankungen
 vat_rate: 0.19               # USt. wird immer eingerechnet
 approval_phrase: "Ich gebe die Kosten für dieses Video frei"
 min_stimmen: 5
+
+# Qualitäts-Tore (siehe docs/UMBAU-BERICHT.md)
+storyboard_freigabe_erforderlich: true   # Animation erst nach menschlicher Sichtung des Storyboards
+ki_bildpruefung: true                    # Claude prüft Storyboard-Bilder gegen Vorlagen und Handlung (≈ 0,03 €)
 
 # Keine automatischen Wiederholungen: schlägt ein Auftrag fehl, endet der Lauf. Bezahlte Ergebnisse
 # bleiben im Cache und werden beim nächsten Lauf kostenlos wiederverwendet.

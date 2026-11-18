@@ -13,17 +13,25 @@ import yaml
 
 from csu.common import STORIES, budget, episode_path, load_episode
 
-SYSTEM = """Du schreibst Folgen einer deutschen 2D-Cartoon-Serie im Hochformat (TikTok/Shorts), 60–90 Sekunden.
-Antworte NUR mit gültigem YAML im exakt gleichen Schema wie die Beispiel-Folge. Regeln:
-- 12–15 Szenen, je 3–9 s; letzte Szene hat `entscheidung: true` (Cliffhanger, Erzähler fragt nach 1, 2 oder 3).
-- keyframe_prompt und motion_prompt auf Englisch, Figuren/Orte NUR über @ref_tag aus der Story-Bibel, max. 3 Tags.
-- Erzähler- und Dialogtexte auf Deutsch, kurz (≤ 14 Zeichen pro Sekunde Szenendauer), Zahlen ausgeschrieben.
-- Die Folge setzt GENAU die gewählte Option der letzten Folge fort (ihre Effekte werden automatisch angezeigt –
-  nicht erneut als hud-Ereignis eintragen).
-- hud-Ereignisse nur mit Schlüsseln aus der Story-Bibel; jede Änderung muss vom aktuellen Stand aus möglich sein
-  (keine negativen Werte, Prozent 0–100). Inventar: items: ["+Name"] / ["-Name"].
-- Genau drei Optionen 1/2/3 mit kurzen Texten und rechnerisch möglichen Effekten, plus `standard`.
-- Kein Text im Bild, keine echten Marken oder Personen."""
+SYSTEM = """Du schreibst Storyboards einer deutschen 2D-Cartoon-Serie im Hochformat (TikTok/Shorts), 60–90 Sekunden.
+Antworte NUR mit gültigem YAML exakt im Format der Beispiel-Folge (Storyboard v2). Verbindliche Regeln:
+- 10–14 nummerierte Szenen; je Szene: nr, ort, figuren, (ansicht), tageszeit, handlung, bild, kamera, kamerabewegung,
+  bewegung, uebergang, dauer (4, 6 oder 8). Optional erzaehler, dialog, sfx, hud (max. 1 Änderung je Szene).
+- Nur Orte/Figuren-Schlüssel aus der Story-Bibel, max. 3 Figuren je Szene, keine @-Tags, keine Nebenfiguren,
+  die nicht in der Bibel stehen. Wer spricht, muss im Bild sein.
+- kamera ∈ totale, halbtotale, halbnah, nah, gross, detail, ueber_schulter, aufsicht, untersicht;
+  kamerabewegung ∈ statisch, schwenk_links, schwenk_rechts, ranfahrt, rueckfahrt, begleitfahrt, neigung_hoch,
+  neigung_runter (meist statisch – Kamerabewegung nur, wenn sie der Handlung dient).
+- uebergang: erste Szene abblende; „anschluss“ NUR bei gleichem Ort, gleichen Figuren, gleicher Kamera und Tageszeit
+  (Handlung läuft nahtlos weiter); Orts- oder Zeitsprung mit „ueberblendung“; sonst „schnitt“ mit ANDERER Einstellung.
+  Ein neuer Ort wird zuerst mit totale oder halbtotale gezeigt. Tageszeit läuft nie rückwärts.
+- handlung (deutsch) sagt, was passiert und warum; jede Szene folgt logisch aus der vorigen (Ursache → Wirkung).
+- bild (englisch): Startbild mit klarer Komposition; bewegung (englisch): konkrete, sichtbare Aktion der Figuren
+  passend zur Handlung, keine Kamerabeschreibung darin.
+- Sprechtext pro Szene höchstens 14 Zeichen pro Sekunde Szenendauer minus 1 Sekunde; Zahlen ausgeschrieben.
+- Die Folge setzt GENAU die gewählte Option der letzten Folge fort (deren Effekte werden automatisch angezeigt).
+- Letzte Szene: Cliffhanger mit entscheidung: true; genau drei Optionen 1/2/3 mit rechnerisch möglichen Effekten
+  und `standard`. Kein Text im Bild, keine echten Marken oder Personen."""
 
 
 def build_prompt(story: dict, state: dict) -> str:

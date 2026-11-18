@@ -62,7 +62,13 @@ def episode_path(slug: str, part: int) -> Path:
 
 def load_episode(slug: str, part: int) -> dict | None:
     p = episode_path(slug, part)
-    return load_yaml(p) if p.exists() else None
+    if not p.exists():
+        return None
+    ep = load_yaml(p)
+    for i, s in enumerate(ep.get("szenen") or [], 1):  # Szenen-ID aus der Storyboard-Nummer
+        s.setdefault("id", f"S{int(s.get('nr', i)):02d}")
+        s.setdefault("figuren", [])
+    return ep
 
 
 def write_json(path: Path, data: Any) -> None:

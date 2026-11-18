@@ -60,6 +60,12 @@ def run_jobs(plan: EpisodePlan, clients: dict, raw: Path, cache: Path, log=print
             shutil.copy2(files[job.id], cached)
         if job.kind == "image":
             outputs[job.id] = sff.image_to_data_uri(files[job.id])
+        if job.kind == "video":   # letztes Bild → Startbild einer folgenden „anschluss“-Szene (kostenlos)
+            lf = raw / f"LF_{job.id}.jpg"
+            _run(["ffmpeg", "-y", "-v", "error", "-sseof", "-0.05", "-i", str(files[job.id]), "-frames:v", "1",
+                  "-q:v", "2", str(lf)])
+            files[f"LF_{job.id}"] = lf
+            outputs[f"LF_{job.id}"] = sff.image_to_data_uri(lf)
     return files
 
 
@@ -76,7 +82,7 @@ def probe_duration(path: Path) -> float:
     return float(r.stdout.strip())
 
 
-def _cues(text: str, start: float, dur: float, erzaehler: bool, max_chars: int = 38) -> list[dict]:
+def _cues(text: str, start: float, dur: float, erzaehler: bool, max_chars: int = 32) -> list[dict]:
     words, chunks, cur = text.split(), [], ""
     for w in words:
         if cur and len(cur) + 1 + len(w) > max_chars:
@@ -104,7 +110,8 @@ def timeline(story: dict, ep: dict, files: dict[str, Path], events: list[dict]) 
         for it in speech_items(story, s):
             d = probe_duration(files[it["id"]])
             audio.append({"file": files[it["id"]], "at": t + cursor, "vol": 1.0})
-            cues += _cues(it["text"], t + cursor, d, it["erzaehler"])
+            if not s.get("entscheidung"):   # Auswahlkarte zeigt die Frage bereits – kein doppelter Text
+                cues += _cues(it["text"], t + cursor, d, it["erzaehler"])
             cursor += d + GAP
         dur = max(float(s["dauer"]), cursor + TAIL)
         for i, fx in enumerate(s.get("sfx") or []):
@@ -118,7 +125,7 @@ def timeline(story: dict, ep: dict, files: dict[str, Path], events: list[dict]) 
                 k += 1
         if s.get("entscheidung"):
             choice = {**ep["entscheidung"], "start": t + 0.4}
-        scenes.append({"id": s["id"], "start": round(t, 3), "dauer": round(dur, 3)})
+        scenes.append({"id": s["id"], "start": round(t, 3), "dauer": round(dur, 3), "uebergang": s["uebergang"]})
         t += dur
     return {"scenes": scenes, "audio": audio, "cues": cues, "events": hud_events, "choice": choice, "total": round(t, 3)}
 
@@ -134,13 +141,25 @@ def assemble(story: dict, ep: dict, start_werte: dict, events: list[dict], files
 
     # 1) Szenen: 1080×1920, 30 fps, exakte Länge (bei Bedarf letztes Bild halten)
     segs = []
-    for sc in tl["scenes"]:
+    scs = tl["scenes"]
+    for i, sc in enumerate(scs):
         clip = files[f"VID_{sc['id']}"]
         seg = work / f"{sc['id']}.mp4"
+        fades = ""
+        if sc["uebergang"] == "abblende":
+            fades += ",fade=t=in:st=0:d=0.6"
+        elif sc["uebergang"] == "ueberblendung":
+            fades += ",fade=t=in:st=0:d=0.4"
+        nxt = scs[i + 1]["uebergang"] if i + 1 < len(scs) else "ende"
+        if nxt == "ueberblendung":
+            fades += f",fade=t=out:st={sc['dauer'] - 0.4:.2f}:d=0.4"
+        elif nxt in ("abblende", "ende"):
+            fades += f",fade=t=out:st={sc['dauer'] - 0.6:.2f}:d=0.6"
         _run(["ffmpeg", "-y", "-v", "error", "-i", str(clip), "-vf",
               f"scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos,crop={W}:{H},fps={FPS},"
-              f"tpad=stop_mode=clone:stop_duration=10,trim=duration={sc['dauer']},setpts=PTS-STARTPTS,setsar=1",
-              "-an", "-c:v", "libx264", "-preset", v["preset"], "-crf", "16", "-pix_fmt", "yuv420p", str(seg)])
+              f"tpad=stop_mode=clone:stop_duration=10,trim=duration={sc['dauer']},setpts=PTS-STARTPTS,setsar=1"
+              f"{fades}",
+              "-an", "-c:v", "libx264", "-preset", v["preset"], "-crf", "14", "-pix_fmt", "yuv420p", str(seg)])
         segs.append(seg)
     lst = work / "liste.txt"
     lst.write_text("".join(f"file '{p.name}'\n" for p in segs), encoding="utf-8")
@@ -180,28 +199,5 @@ def assemble(story: dict, ep: dict, start_werte: dict, events: list[dict], files
           "-c:v", "libx264", "-preset", v["preset"], "-crf", str(v["crf"]), "-profile:v", "high",
           "-pix_fmt", "yuv420p", "-r", str(FPS), "-c:a", "aac", "-b:a", v["audio_bitrate"], "-ar", "48000",
           "-movflags", "+faststart", "-t", str(total), str(out.resolve())])
-    qc = quality_check(out, W, H, FPS, prod["video"]["ziel_sekunden"])
     write_json(out_dir / "timeline.json", {**tl, "audio": [{**a, "file": str(a["file"])} for a in tl["audio"]]})
-    return {"datei": str(out), "laenge_s": total, "qc": qc}
-
-
-def quality_check(path: Path, W: int, H: int, FPS: int, ziel) -> dict:
-    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
-                        "stream=codec_name,codec_type,width,height,r_frame_rate:format=duration",
-                        "-of", "json", str(path)], capture_output=True, text=True, check=True)
-    info = json.loads(r.stdout)
-    vs = next(s for s in info["streams"] if s["codec_type"] == "video")
-    au = next((s for s in info["streams"] if s["codec_type"] == "audio"), None)
-    dur = float(info["format"]["duration"])
-    problems = []
-    if (vs["width"], vs["height"]) != (W, H):
-        problems.append(f"Auflösung {vs['width']}×{vs['height']}")
-    if vs["codec_name"] != "h264" or not au or au["codec_name"] != "aac":
-        problems.append("Codec nicht H.264/AAC")
-    if vs["r_frame_rate"] != f"{FPS}/1":
-        problems.append(f"Bildrate {vs['r_frame_rate']}")
-    if not ziel[0] - 1 <= dur <= ziel[1] + 1:
-        problems.append(f"Länge {dur:.1f}s")
-    if problems:
-        raise RuntimeError("Qualitätsprüfung fehlgeschlagen: " + "; ".join(problems))
-    return {"breite": W, "hoehe": H, "fps": FPS, "laenge_s": round(dur, 2), "ok": True}
+    return {"datei": str(out), "laenge_s": total, "timeline": tl}

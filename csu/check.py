@@ -25,33 +25,49 @@ def _ff(*args: str) -> None:
     subprocess.run(["ffmpeg", "-y", "-v", "error", *args], check=True)
 
 
+FARBEN = ["0x5B8DEF", "0xEF8D5B", "0x5BEF8D", "0xD65BEF", "0xEFD65B", "0x5BD6EF", "0xEF5B7A", "0x8DEF5B"]
+
+
 def schnitt_pruefung() -> dict:
+    """Echter Schnitt + Qualitätskontrolle mit Platzhaltern (Farbflächen mit bewegtem Objekt, Sinustöne).
+    Anschluss-Szenen bekommen dieselbe Farbe wie die Vorszene → die QC muss sie als nahtlos erkennen."""
+    from csu import qc
     from csu.render import assemble
     story = load_story("die-letzten-10000")
     ep = load_episode("die-letzten-10000", 1)
     st = initial_state(story)
     events, _ = simulate(story, st, ep)
+    v = production()["video"]
     tmp = Path(tempfile.mkdtemp(prefix="csu-pruefung-"))
     files: dict[str, Path] = {}
     try:
-        for s in ep["szenen"]:
+        farbe = 0
+        for i, s in enumerate(ep["szenen"]):
+            if s["uebergang"] != "anschluss" and i:
+                farbe += 1
             p = tmp / f"VID_{s['id']}.mp4"
-            _ff("-f", "lavfi", "-i", "testsrc2=size=720x1280:rate=24:duration=5", "-c:v", "libx264", "-preset",
-                "ultrafast", str(p))
+            _ff("-f", "lavfi", "-i", f"color=c={FARBEN[farbe % len(FARBEN)]}:s=1080x1920:r=24:d={s['dauer']}",
+                "-vf", "drawbox=x='200+t*60':y=800:w=200:h=200:color=white:t=fill",
+                "-c:v", "libx264", "-preset", "ultrafast", str(p))
             files[f"VID_{s['id']}"] = p
             for it in speech_items(story, s):
                 q = tmp / f"{it['id']}.mp3"
-                _ff("-f", "lavfi", "-i", f"sine=frequency=440:duration={len(it['text']) / CHARS_PER_SECOND:.2f}",
-                    str(q))
+                _ff("-f", "lavfi", "-i", f"sine=frequency=440:duration={len(it['text']) / CHARS_PER_SECOND:.2f}", str(q))
                 files[it["id"]] = q
-            for i, fx in enumerate(s.get("sfx") or []):
-                q = tmp / f"SFX_{s['id']}_{i + 1}.mp3"
+            for k, fx in enumerate(s.get("sfx") or []):
+                q = tmp / f"SFX_{s['id']}_{k + 1}.mp3"
                 _ff("-f", "lavfi", "-i", f"sine=frequency=880:duration={fx['dauer']}", str(q))
-                files[f"SFX_{s['id']}_{i + 1}"] = q
+                files[f"SFX_{s['id']}_{k + 1}"] = q
         music = tmp / "musik.mp3"
-        _ff("-f", "lavfi", "-i", "sine=frequency=220:duration=30", str(music))
+        _ff("-f", "lavfi", "-i", "anoisesrc=d=30:c=pink:a=0.3", str(music))
         res = assemble(story, ep, st["werte"], events, files, music, tmp / "out", "pruefung.mp4")
-        return res["qc"]
+        pr = qc.pruefen(Path(res["datei"]), tmp / "out" / "schnitt" / "bild.mp4", res["timeline"], ep,
+                        [files[f"VID_{s['id']}"] for s in ep["szenen"]], v["breite"], v["hoehe"], v["fps"],
+                        v["ziel_sekunden"])
+        if os.environ.get("CSU_PRUEFBILD"):
+            qc.kontaktbogen(Path(res["datei"]), res["timeline"]["scenes"], ep, Path(os.environ["CSU_PRUEFBILD"]))
+        return {"ok": pr["ok"], "detail": "; ".join(f"{p['name']} {'ok' if p['ok'] else '✗ ' + p['detail']}"
+                                                     for p in pr["pruefungen"]), "qc": pr}
     finally:
         shutil.rmtree(tmp, ignore_errors=True)   # kein Probevideo aufbewahren
 
