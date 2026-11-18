@@ -1,0 +1,140 @@
+geschichte: das-haus-am-nebelsee
+teil: 1
+titel: "Die Tür war zu"
+
+szenen:
+  - id: S01
+    dauer: 5
+    ort: villa
+    kamera: "Totale, Kutsche rollt durch den Nebel, ein Blitz erhellt die Villa"
+    keyframe_prompt: "A small horse carriage rolling toward @villa through thick fog, @ella in a yellow raincoat peeking out of the carriage window, lightning flash behind the towers"
+    motion_prompt: "The carriage rolls slowly forward through drifting fog, lightning flashes and lights up the villa towers, camera pushes in"
+    erzaehler: "Nebelsee. Ein Sturm. Noch sechs Stunden Zeit."
+    sfx: [{prompt: "distant thunder, horse hooves on wet gravel, light rain", dauer: 4, at: 0.2}]
+
+  - id: S02
+    dauer: 5
+    ort: villa
+    kamera: "Untersicht auf die Haustür, Albert ragt riesig im Türrahmen auf"
+    keyframe_prompt: "Low angle: very tall @albert opening the heavy front door of @villa holding a candelabra, @ella small in front of him in the rain"
+    motion_prompt: "The heavy door creaks open, candle flames flicker in the wind, the butler looks down solemnly, camera tilts up"
+    dialog:
+      - {figur: albert, text: "Die gnädige Frau ist fort. Und die Tür war zu."}
+    sfx: [{prompt: "heavy wooden door creaking open, wind howling", dauer: 3, at: 0.0}]
+
+  - id: S03
+    dauer: 5
+    ort: salon
+    kamera: "Halbtotale, Ella geht durch den Salon, Viktor zappelt im Hintergrund"
+    keyframe_prompt: "@ella walking through @salon with her magnifying glass, @viktor in the background fidgeting nervously next to the fireplace"
+    motion_prompt: "She strides across the rug looking around, he wrings his hands and adjusts his monocle, firelight flickers"
+    dialog:
+      - {figur: viktor, text: "Clara macht nur Theater. Bestimmt!"}
+    sfx: [{prompt: "crackling fireplace and a ticking grandfather clock", dauer: 4, at: 0.0}]
+
+  - id: S04
+    dauer: 4
+    ort: villa
+    kamera: "Fahrt die Wendeltreppe hinauf, Alberts Kerzenlicht tanzt an der Wand"
+    keyframe_prompt: "@albert and @ella climbing a narrow spiral staircase inside a tower of @villa, candlelight casting long shadows"
+    motion_prompt: "Camera spirals upward behind them as they climb, shadows stretch and dance on the stone walls"
+    erzaehler: "Oben im Turm: das Zimmer."
+    sfx: [{prompt: "slow footsteps on old wooden stairs, creaking", dauer: 3, at: 0.0}]
+
+  - id: S05
+    dauer: 5
+    ort: turmzimmer
+    kamera: "Detail auf den Riegel, Ella hält die Lupe davor"
+    keyframe_prompt: "Close-up of a heavy iron bolt on the inside of the door of @turmzimmer, @ella holding her magnifying glass in front of it, one big eye magnified"
+    motion_prompt: "The magnifying glass moves along the bolt, her magnified eye blinks, camera slowly pushes in"
+    dialog:
+      - {figur: ella, text: "Riegel von innen. Kein Fadentrick."}
+    sfx: [{prompt: "metal bolt clinking, soft magnifying glass tap", dauer: 2, at: 1.0}]
+
+  - id: S06
+    dauer: 6
+    ort: turmzimmer
+    kamera: "Langsamer Schwenk vom umgekippten Stuhl zum leeren Vogelkäfig"
+    keyframe_prompt: "Inside @turmzimmer: the overturned chair on the floor and the open empty birdcage hanging by the window, @ella kneeling beside it"
+    motion_prompt: "Slow pan from the overturned chair to the swinging open birdcage, she looks up with a curious smirk"
+    erzaehler: "Ein umgekippter Stuhl. Ein leerer Käfig."
+    hud: [{key: hinweise, zu: 1}]
+    sfx: [{prompt: "birdcage door creaking and swinging, a single sparkling discovery chime", dauer: 3, at: 2.0}]
+
+  - id: S07
+    dauer: 5
+    ort: turmzimmer
+    kamera: "Makro auf Federn am Boden, Ella folgt ihnen mit der Lupe"
+    keyframe_prompt: "Macro view of small blue feathers on the wooden floor of @turmzimmer forming a trail toward the window, @ella's magnifying glass hovering over them"
+    motion_prompt: "The camera follows the feather trail along the floor toward the window, a feather lifts in a draft and drifts"
+    erzaehler: "Federn. Eine Spur führt zum Fenster."
+    sfx: [{prompt: "soft whoosh of a feather drifting, light rain on glass", dauer: 3, at: 0.5}]
+
+  - id: S08
+    dauer: 5
+    ort: turmzimmer
+    kamera: "Naheinstellung Fenster, Bretter und Nägel, Ella dreht sich verblüfft um"
+    keyframe_prompt: "The window of @turmzimmer nailed shut with old wooden planks and rusty nails, foggy lake behind, @ella staring at it with raised eyebrows"
+    motion_prompt: "She taps a plank and it does not budge, she turns to the camera with a puzzled look, fog swirls outside"
+    dialog:
+      - {figur: ella, text: "Zugenagelt! Wie kam der Vogel raus?"}
+    hud: [{key: hinweise, zu: 2}]
+    sfx: [{prompt: "knocking on wooden planks, then a bright discovery chime", dauer: 3, at: 0.5}]
+
+  - id: S09
+    dauer: 5
+    ort: turmzimmer
+    kamera: "Albert im Türrahmen, Kerzenlicht von unten"
+    keyframe_prompt: "@albert standing in the doorway of @turmzimmer, candelabra lighting his solemn face from below, @ella in the foreground looking back at him"
+    motion_prompt: "The candle flames flicker, the butler slowly raises one bushy eyebrow, camera pushes in on his face"
+    dialog:
+      - {figur: albert, text: "Das Fenster ist seit Jahren zugenagelt."}
+    sfx: [{prompt: "low ominous clarinet note and wind outside", dauer: 3, at: 0.0}]
+
+  - id: S10
+    dauer: 5
+    ort: salon
+    kamera: "Schuss-Gegenschuss, Viktor schwitzt, Ella mustert ihn über den Brillenrand"
+    keyframe_prompt: "@viktor sweating and tugging his collar in front of @ella in @salon, she narrows her eyes behind her round glasses"
+    motion_prompt: "He dabs his forehead with a handkerchief and glances at the clock, she studies him with her magnifying glass raised"
+    dialog:
+      - {figur: viktor, text: "Ich war die ganze Zeit unten! Ehrlich!"}
+    sfx: [{prompt: "nervous short string pizzicato, clock ticking", dauer: 3, at: 0.0}]
+
+  - id: S11
+    dauer: 5
+    ort: salon
+    kamera: "Untersicht auf die Standuhr, Pendel schwingt, Zeiger springt"
+    keyframe_prompt: "The grandfather clock in @salon striking the hour, pendulum swinging, @ella looking up at it with worry"
+    motion_prompt: "The clock hands jump forward, the pendulum swings wildly, chandelier crystals tremble"
+    erzaehler: "Die Standuhr schlägt. Eine Stunde ist weg."
+    hud: [{key: stunden, delta: -1}]
+    sfx: [{prompt: "deep grandfather clock chimes", dauer: 4, at: 0.0}]
+
+  - id: S12
+    dauer: 5
+    ort: salon
+    kamera: "Alle erstarren, Kamera zoomt ruckartig auf Ellas Gesicht"
+    keyframe_prompt: "@ella, @albert and @viktor frozen in shock in @salon, all looking toward the floor as if a sound came from below"
+    motion_prompt: "A distant scream echoes, chandelier sways, all three whip their heads toward the floor, camera zooms sharply on Ella"
+    dialog:
+      - {figur: albert, text: "Das kam aus dem Keller!"}
+    sfx: [{prompt: "distant muffled scream echoing from below, thunder crack", dauer: 3, at: 0.0}]
+
+  - id: S13
+    dauer: 8
+    ort: salon
+    kamera: "Ella im Vordergrund, hinter ihr am Fenster zeichnet sich ein Schatten ab"
+    keyframe_prompt: "@ella in the foreground of @salon looking at the camera, behind her a dark silhouette of a figure in the rain-streaked window, lightning flash"
+    motion_prompt: "A lightning flash reveals the shadow at the window, it vanishes, she slowly turns her head to the camera, suspenseful push-in"
+    erzaehler: "Keller, Steg oder Salon? Eins, zwei oder drei? Schreib es in die Kommentare!"
+    entscheidung: true
+    sfx: [{prompt: "suspense riser ending in a single dramatic hit, thunder", dauer: 5, at: 2.5}]
+
+entscheidung:
+  frage: "Wohin soll Ella zuerst?"
+  optionen:
+    1: {text: "In den Keller", effekte: {stunden: -1}}
+    2: {text: "Dem Schatten zum Steg folgen", effekte: {hinweise: 1, stunden: -1}}
+    3: {text: "Alle Gäste im Salon versammeln", effekte: {verdaechtige: -1}}
+  standard: 1

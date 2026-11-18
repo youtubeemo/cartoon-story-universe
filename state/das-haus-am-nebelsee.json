@@ -1,11 +1,51 @@
 {
   "geschichte": "das-haus-am-nebelsee",
-  "naechster_teil": 1,
+  "naechster_teil": 2,
   "werte": {
-    "stunden": 6,
-    "hinweise": 0,
+    "stunden": 5,
+    "hinweise": 2,
     "verdaechtige": 4
   },
-  "offene_entscheidung": null,
-  "verlauf": []
+  "offene_entscheidung": {
+    "teil": 1,
+    "frage": "Wohin soll Ella zuerst?",
+    "standard": 1,
+    "optionen": {
+      "1": {
+        "text": "In den Keller",
+        "effekte": {
+          "stunden": -1
+        }
+      },
+      "2": {
+        "text": "Dem Schatten zum Steg folgen",
+        "effekte": {
+          "hinweise": 1,
+          "stunden": -1
+        }
+      },
+      "3": {
+        "text": "Alle Gäste im Salon versammeln",
+        "effekte": {
+          "verdaechtige": -1
+        }
+      }
+    },
+    "option": null
+  },
+  "verlauf": [
+    {
+      "teil": 1,
+      "datum": "2026-11-18",
+      "datei": "2026-11-18_das-haus-am-nebelsee_teil-01.mp4",
+      "titel": "Die Tür war zu",
+      "wahl_davor": null,
+      "werte_danach": {
+        "stunden": 5,
+        "hinweise": 2,
+        "verdaechtige": 4
+      },
+      "eur": 5.01
+    }
+  ]
 }
