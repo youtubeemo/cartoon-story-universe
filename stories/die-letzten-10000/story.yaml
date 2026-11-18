@@ -12,6 +12,16 @@ figuren:
     name: Jonas
     ref_tag: jonas
     beschreibung: "21, Fahrradkurier, schlaksig, rote Locken, Sommersprossen, orange Kurierjacke, grüner Rucksack"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "21-year-old adult man (not a kid), copper-red curly hair, freckles, fair skin, orange courier jacket, mint backpack"
+      alter: "21-year-old young adult man, clearly an adult, not a child or teenager"
+      gesicht: "long narrow face, pointed chin, light freckles across nose and cheeks, big green eyes, thin straight eyebrows"
+      frisur: "short messy curly hair, curls on top, shorter sides"
+      haarfarbe: "bright copper red"
+      haut: "fair peach skin"
+      kleidung: "bright orange zip-up courier jacket over a white T-shirt, grey cargo pants, white sneakers, mint-green backpack"
+      koerper: "tall and lanky, long thin arms and legs, adult proportions (head about 1/7 of body height)"
+      farben: {haare: "#D9572B", jacke: "#F28B26", rucksack: "#7FD1B9"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: lanky 21-year-old man, messy red curly
       hair, freckles, big hopeful green eyes, bright orange courier jacket, mint-green messenger backpack,
@@ -21,6 +31,16 @@ figuren:
     name: Aylin
     ref_tag: aylin
     beschreibung: "22, Bäckerin bei Oma Edith, schwarzer Zopf, mehlbestäubte blaue Schürze, energisch"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "22-year-old woman, long black braid, light olive-tan skin, navy apron over white T-shirt"
+      alter: "22-year-old young woman"
+      gesicht: "oval face, warm brown eyes, thick dark eyebrows, determined expression"
+      frisur: "long single braid over the left shoulder"
+      haarfarbe: "black"
+      haut: "warm light olive-tan skin"
+      kleidung: "navy-blue apron dusted with flour over a white T-shirt with rolled sleeves, dark grey trousers, brown work shoes"
+      koerper: "average height, athletic build, adult proportions"
+      farben: {haare: "#1F1A1C", schuerze: "#26315C"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: energetic 22-year-old woman, long black
       braid, warm brown eyes, flour-dusted navy-blue apron over a white shirt, sleeves rolled up, confident
@@ -30,6 +50,16 @@ figuren:
     name: Herr Grell
     ref_tag: grell
     beschreibung: "55, Immobilienhai, glatzköpfig, spitzer Schnurrbart, lila Anzug, goldener Füller"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "55-year-old very tall thin bald man, pale skin, thin black moustache, purple three-piece suit"
+      alter: "55-year-old man"
+      gesicht: "long narrow face, sharp hooked nose, narrow scheming eyes, thin pointed black moustache, smug grin"
+      frisur: "completely bald, shiny head"
+      haarfarbe: "none (bald); black moustache"
+      haut: "pale light skin with pinkish cheeks"
+      kleidung: "shiny purple three-piece suit, black shirt, black tie, pointed black shoes, gold fountain pen"
+      koerper: "very tall and thin, long limbs, narrow shoulders"
+      farben: {anzug: "#6B3FA0"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: tall thin 55-year-old man, bald head,
       thin pointed black moustache, narrow eyes, shiny purple three-piece suit, gold fountain pen in hand,

@@ -15,6 +15,16 @@ figuren:
     name: Nova
     ref_tag: nova
     beschreibung: "29, Technikerin, kurze lila Haare, weißer Raumanzug mit orangen Streifen, Headset"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "29-year-old woman, purple undercut, medium brown skin, white space suit with orange stripes"
+      alter: "29-year-old woman"
+      gesicht: "heart-shaped face, brown eyes, brave look"
+      frisur: "short undercut"
+      haarfarbe: "purple"
+      haut: "medium brown skin"
+      kleidung: "white space suit with orange stripes, headset microphone, tool belt"
+      koerper: "athletic, average height"
+      farben: {haare: "#8E5CC2", streifen: "#F28B26"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: 29-year-old woman technician, short
       purple undercut hair, white space suit with orange stripes, headset microphone, tool belt, brave look, plain light background.
@@ -23,6 +33,16 @@ figuren:
     name: BOLT
     ref_tag: bolt
     beschreibung: "Kleiner runder Wartungsroboter, ein großes blaues Kameraauge, Greifarme, schwebt"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "small round floating white-and-orange robot, one big blue camera eye"
+      alter: "small maintenance robot"
+      gesicht: "one big glowing blue camera eye, no mouth"
+      frisur: "none"
+      haarfarbe: "none"
+      haut: "round white-and-orange shell"
+      kleidung: "none"
+      koerper: "small, round, floating, two tiny gripper arms, short antenna"
+      farben: {schale: "#F4F4F4", auge: "#3AA0FF"}
     reference_prompt: >
       2D cartoon character model sheet, front and side view: small round floating maintenance robot, white
       and orange shell, one big glowing blue camera eye, two tiny gripper arms, antenna, cute, plain light background.

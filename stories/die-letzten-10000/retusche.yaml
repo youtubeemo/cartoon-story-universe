@@ -1,0 +1,14 @@
+# Kostenlose Retusche (illu/retusche.py) der Bilder aus dem Bildtest vom 18.11.2026.
+# Koordinaten in Pixeln des 1080×1920-Bildes.
+
+608959825ff9958f1469.png:          # s21 Aylin & Jonas am kaputten Ofen
+  - {box: [780, 125, 990, 215], grund: "Augen auf Brot (oberes Regal)"}
+  - {box: [835, 380, 1010, 445], grund: "Augen auf Brot (mittleres Regal)"}
+  - {box: [925, 595, 1060, 665], grund: "Gesicht auf Brot (unteres Regal)"}
+  - {box: [100, 1575, 380, 1705], grund: "Fantasieschrift „ATAN“ auf der Theke", schwelle: 30, durchgaenge: 3}
+  - {box: [826, 1042, 872, 1090], grund: "Buchstaben-Logo auf Jonas' Jacke", schwelle: 40, durchgaenge: 2}
+
+ref_strasse.png:                   # Ortsreferenz Straße (wird in den nächsten Bildern weiterverwendet)
+  - {box: [105, 826, 335, 918], grund: "Fantasieschrift auf Ladenschild", schwelle: 45}
+  - {box: [990, 952, 1080, 1018], grund: "Fantasieschrift rechts", schwelle: 45}
+  - {box: [522, 1064, 640, 1097], grund: "Fantasieschrift kleines Schild", schwelle: 45}

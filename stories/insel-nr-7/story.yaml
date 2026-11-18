@@ -15,6 +15,16 @@ figuren:
     name: Mila
     ref_tag: mila
     beschreibung: "26, Pilotin, kurze blonde Haare, Fliegerbrille auf der Stirn, olivgrüner Overall, Pflaster an der Wange"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "26-year-old athletic woman, short blonde hair, goggles on forehead, olive jumpsuit, cheek bandage"
+      alter: "26-year-old woman"
+      gesicht: "square face, blue eyes, small bandage on the left cheek"
+      frisur: "short messy hair"
+      haarfarbe: "blonde"
+      haut: "fair skin"
+      kleidung: "olive-green pilot jumpsuit with rolled sleeves, aviator goggles on the forehead"
+      koerper: "athletic, average height"
+      farben: {overall: "#6B7F3A", haare: "#F2C14E"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: athletic 26-year-old woman, short messy
       blonde hair, aviator goggles pushed up on her forehead, olive-green pilot jumpsuit with rolled sleeves,
@@ -24,6 +34,16 @@ figuren:
     name: Pixel
     ref_tag: pixel
     beschreibung: "Corgi, orange-weiß, rotes Halstuch, sehr mutig, spricht nicht (Bellen per Soundeffekt)"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "chubby orange-and-white corgi, red neckerchief"
+      alter: "adult corgi dog"
+      gesicht: "big pointy ears, expressive happy face"
+      frisur: "none"
+      haarfarbe: "none"
+      haut: "orange-and-white fur"
+      kleidung: "red neckerchief"
+      koerper: "chubby body, very short legs"
+      farben: {fell: "#E8893A", tuch: "#C2402B"}
     reference_prompt: >
       2D cartoon character model sheet, front and side view: chubby orange-and-white corgi dog with big ears,
       short legs, red neckerchief, very expressive happy face, plain light background.

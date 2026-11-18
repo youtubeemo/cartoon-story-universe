@@ -1,0 +1,90 @@
+{
+  "ref_jonas.png": {
+    "status": "fehler",
+    "gruende": [
+      "3D-/Plastik-Look; zwei Ansichten mit unterschiedlichem Hautton; Buchstaben-Logo auf der Jacke"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "ref_aylin.png": {
+    "status": "fehler",
+    "gruende": [
+      "3D-/Plastik-Look; die zwei Ansichten weichen ab (Schuhe, Schürze)"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "ref_grell.png": {
+    "status": "fehler",
+    "gruende": [
+      "3D-/Plastik-Look; Hautfarbe widerspricht der Charakterbibel (hell)"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "ref_backstube.png": {
+    "status": "fehler",
+    "gruende": [
+      "Fantasieschrift im Fenster; Gesichter auf Broten; Puppenköpfe im Regal – zu viel für Retusche"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "ref_strasse.png": {
+    "status": "fehler",
+    "gruende": [
+      "Fantasieschrift auf drei Schildern (Original)"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "ref_strasse.ret.png": {
+    "status": "manuell_ok",
+    "gruende": [
+      "Schrift lokal entfernt; 2D-Stil, keine Figuren – als Ortsreferenz und Stilanker freigegeben"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:38"
+  },
+  "stil_anker.png": {
+    "status": "manuell_ok",
+    "gruende": [
+      "Kopie von ref_strasse.ret.png"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:39"
+  },
+  "59dd1b49bdb65bfdaa5a.png": {
+    "status": "fehler",
+    "gruende": [
+      "s13: Grells Hautfarbe widerspricht der Charakterbibel; Fantasieschrift auf Schildern"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:39"
+  },
+  "5001f3f3b8b860d1e8a3.png": {
+    "status": "fehler",
+    "gruende": [
+      "s15: Jonas als Kind mit schwarzen Haaren statt 21 Jahre/rote Locken; Fantasieschrift"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:39"
+  },
+  "608959825ff9958f1469.png": {
+    "status": "fehler",
+    "gruende": [
+      "s21: Gesichter auf Broten, Fantasieschrift ATAN, Logo auf Jacke"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:39"
+  },
+  "608959825ff9958f1469.ret.png": {
+    "status": "vorbehalt",
+    "gruende": [
+      "s21 retuschiert: Brot, Schrift, Logo entfernt; Jonas passt zur Bibel; Aylins Haut dunkler als Bibel; vor Verwendung gegen neue Referenzen prüfen"
+    ],
+    "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+    "zeit": "2026-11-18T13:39:39"
+  }
+}

@@ -16,6 +16,16 @@ figuren:
     name: Ben
     ref_tag: ben
     beschreibung: "23, Uhrmacher-Lehrling, dunkle Locken, Lupenbrille, Lederschürze, Kapuzenpulli"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "23-year-old man, dark curly hair, loupe glasses on forehead, leather apron over blue hoodie"
+      alter: "23-year-old man"
+      gesicht: "oval face, brown eyes, watchmaker loupe glasses on the forehead"
+      frisur: "dark curly hair"
+      haarfarbe: "dark brown"
+      haut: "light beige skin"
+      kleidung: "brown leather apron over a blue hoodie, golden pocket watch"
+      koerper: "slim, average height"
+      farben: {pulli: "#3A6EA5"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: 23-year-old man, dark curly hair,
       watchmaker loupe glasses on his forehead, brown leather apron over a blue hoodie, holding a glowing
@@ -25,6 +35,16 @@ figuren:
     name: Frieda
     ref_tag: frieda
     beschreibung: "24, Zeitungsreporterin 1923, Bubikopf, Glockenhut, Trenchcoat, Notizblock"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "24-year-old 1920s woman, black bob, red cloche hat, beige trench coat"
+      alter: "24-year-old woman (1920s)"
+      gesicht: "small face, bright eyes, red lips"
+      frisur: "short black bob"
+      haarfarbe: "black"
+      haut: "very fair skin"
+      kleidung: "red cloche hat, beige trench coat, notepad and pencil"
+      koerper: "slim and petite"
+      farben: {hut: "#C2402B", mantel: "#D9C7A5"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: witty 24-year-old woman in 1920s style,
       black bob haircut, red cloche hat, beige trench coat, notepad and pencil, plain light background.

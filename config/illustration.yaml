@@ -10,21 +10,32 @@ bildmodell: gen4_image          # 1080p = 8 Credits je Bild (config/pricing.yaml
 format: "1080:1920"
 max_referenzen: 3               # Runway gen4_image: höchstens 3 Referenzbilder je Bild
 
-# Einheitlicher Stil für jedes Bild (vorn und hinten an den Shot-Prompt gehängt).
+# Einheitlicher Stil – für Referenzblätter UND Shots identisch (flach 2D, ausdrücklich kein 3D).
 stil_vorne: >
-  Polished 2D cartoon illustration, vertical 9:16 frame, rich painterly backgrounds with depth,
-  soft volumetric light, warm saturated colours, clean bold character outlines, expressive faces with
-  big readable emotions, slightly exaggerated proportions, cinematic composition with clear foreground,
-  midground and background, shallow depth of field in the foreground.
+  Flat 2D cartoon illustration, bold clean outlines, two-tone cel shading, vivid colours, detailed painted
+  2D background, warm cinematic light. Not 3D, not CGI, no plastic look.
 stil_hinten: >
-  Consistent character design exactly as in the reference sheets. No text, no letters, no logos,
-  no watermark, no speech bubbles, no UI elements.
+  Characters exactly as in their reference images. Signs and papers blank, no letters. Food without faces.
+  No extra people.
 
+# Referenzblatt: EINE Ansicht von vorn (zwei Ansichten wichen im Test voneinander ab und verwirrten das Modell).
 figur_blatt: >
-  Character reference sheet, full body, front view and three-quarter view side by side on a plain light
-  background, same outfit and colours in both views, neutral expression and a smiling expression.
+  Character reference: one single full-body figure, front view, standing straight, arms relaxed, neutral
+  friendly expression, plain light grey background, nothing else in the image.
 ort_blatt: >
-  Empty background environment, no people, wide establishing view, rich detail, same lighting style.
+  Empty location background, no people, no animals, no text, wide establishing view, rich detail.
+
+# Eigener Stilanker je Geschichte (nur eigene Bilder, keine fremden Werke). Wird bei Referenzblättern als
+# Stilvorlage übergeben und belegt in Shots einen freien dritten Referenzplatz.
+stil_anker: "assets/illu/{slug}/stil_anker.png"
+stil_anker_tag: stilbild
+max_prompt_zeichen: 1000        # Runway-Grenze; längere Prompts werden NICHT gekürzt, sondern abgelehnt
+
+# Qualitätskontrolle (illu/qc.py). Bilder ohne Status ok/manuell_ok gelangen nie in eine Folge.
+qc:
+  ki_pruefung: true             # Claude-Bildprüfung je Bild (≈ 0,02 €), läuft nur im freigegebenen Bilder-Lauf
+  pflicht: [alter, gesicht, frisur, haarfarbe, haut, kleidung, proportionen, kein_text, keine_gesichter_auf_essen,
+            keine_fremden_figuren, stil_2d]
 
 # Shot-Regeln (Prüfung in illu/storyboard.py)
 shot:

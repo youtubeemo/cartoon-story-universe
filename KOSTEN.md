@@ -10,12 +10,14 @@ Claude Sonnet 5.5 2 $ / 10 $ je 1 Mio. Tokens (Input/Output). Rechnung bewusst u
 |---|---:|---:|
 | Runway `gen4_image`: 27 Shot-Bilder (Teil 1 „Die letzten 10.000 €“) | 216 | 2,57 € |
 | Runway: 6 Referenzblätter (nur in der ersten Folge einer Geschichte) | 48 | 0,57 € einmalig |
+| KI-Bildprüfung (Claude) je Bild ≈ 0,02 € | – | ≈ 0,58 € |
 | ElevenLabs: 28 Zeilen ≈ 1.000 Zeichen | – | 0 € (im Abo) |
 | Musik, Geräusche, Schnitt, Anzeigen, Untertitel, Export | – | 0 € |
-| **Summe je Folge** | | **≈ 2,60 €** (Reservierung ≈ 3,20 €) |
+| **Summe je Folge** | | **≈ 3,15 €** |
 
-30 Folgen/Monat ≈ 78 € + Referenzen neuer Geschichten (≈ 0,57 € je Geschichte) – deutlich unter 150 €.
-Erster Bildtest: 6 Referenzen + 3 Shots = 72 Credits ≈ 0,86 €. Rechnung: `python -m illu pruefen SLUG TEIL`.
+30 Folgen/Monat ≈ 95 € + Referenzen neuer Geschichten (≈ 0,60 € je Geschichte) – unter 150 €. Bilder, die die
+Prüfung nicht bestehen, müssen neu erzeugt werden (≈ 0,12 € je Bild inkl. Prüfung) – nur nach Freigabe.
+Erster Bildtest (18.11.2026): 0,86 €. Zweiter Test (geplant): ≈ 0,81 €. Rechnung: `python -m illu pruefen SLUG TEIL`.
 
 ## Je Folge – alter Runway-Weg (76 s, 14 Szenen, aus dem echten Auftragsplan)
 
