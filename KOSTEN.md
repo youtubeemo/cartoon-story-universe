@@ -4,7 +4,20 @@
 Preise geprüft am 18.11.2026: Runway-API 1 Credit = 0,01 $, gen4_turbo 5 Credits/s, gen4_image_turbo 2 Credits/Bild;
 Claude Sonnet 5.5 2 $ / 10 $ je 1 Mio. Tokens (Input/Output). Rechnung bewusst ungünstig: 1 $ = 1 €, plus 19 % USt.
 
-## Je Folge (76 s, 14 Szenen, aus dem echten Auftragsplan)
+## Weg 1 – illustrierter Look (`illu/`, noch nicht freigegeben)
+
+| Posten | Credits | Zusätzliche Kosten |
+|---|---:|---:|
+| Runway `gen4_image`: 27 Shot-Bilder (Teil 1 „Die letzten 10.000 €“) | 216 | 2,57 € |
+| Runway: 6 Referenzblätter (nur in der ersten Folge einer Geschichte) | 48 | 0,57 € einmalig |
+| ElevenLabs: 28 Zeilen ≈ 1.000 Zeichen | – | 0 € (im Abo) |
+| Musik, Geräusche, Schnitt, Anzeigen, Untertitel, Export | – | 0 € |
+| **Summe je Folge** | | **≈ 2,60 €** (Reservierung ≈ 3,20 €) |
+
+30 Folgen/Monat ≈ 78 € + Referenzen neuer Geschichten (≈ 0,57 € je Geschichte) – deutlich unter 150 €.
+Erster Bildtest: 6 Referenzen + 3 Shots = 72 Credits ≈ 0,86 €. Rechnung: `python -m illu pruefen SLUG TEIL`.
+
+## Je Folge – alter Runway-Weg (76 s, 14 Szenen, aus dem echten Auftragsplan)
 
 | Posten | Credits | Zusätzliche Kosten |
 |---|---:|---:|

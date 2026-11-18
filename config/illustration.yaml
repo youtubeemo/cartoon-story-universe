@@ -1,0 +1,61 @@
+# =====================================================================
+#  Weg 1 – illustrierter Look (siehe docs/STILBIBEL-ILLU.md)
+#  KI-Illustrationen je Shot (nur Standbilder) + eigene Pipeline für Kamera, Anzeigen, Untertitel, Ton.
+#  Kostenpflichtig ist nur die Bilderzeugung; sie läuft ausschließlich über csu.produktion.Lauf
+#  (Freigabephrase, Kasse, SpendGuard). Hier wird nichts automatisch ausgelöst.
+# =====================================================================
+
+aktiv: false                    # bezahlte Bilderzeugung für Weg 1 – nur nach Freigabe im Chat auf true
+bildmodell: gen4_image          # 1080p = 8 Credits je Bild (config/pricing.yaml)
+format: "1080:1920"
+max_referenzen: 3               # Runway gen4_image: höchstens 3 Referenzbilder je Bild
+
+# Einheitlicher Stil für jedes Bild (vorn und hinten an den Shot-Prompt gehängt).
+stil_vorne: >
+  Polished 2D cartoon illustration, vertical 9:16 frame, rich painterly backgrounds with depth,
+  soft volumetric light, warm saturated colours, clean bold character outlines, expressive faces with
+  big readable emotions, slightly exaggerated proportions, cinematic composition with clear foreground,
+  midground and background, shallow depth of field in the foreground.
+stil_hinten: >
+  Consistent character design exactly as in the reference sheets. No text, no letters, no logos,
+  no watermark, no speech bubbles, no UI elements.
+
+figur_blatt: >
+  Character reference sheet, full body, front view and three-quarter view side by side on a plain light
+  background, same outfit and colours in both views, neutral expression and a smiling expression.
+ort_blatt: >
+  Empty background environment, no people, wide establishing view, rich detail, same lighting style.
+
+# Shot-Regeln (Prüfung in illu/storyboard.py)
+shot:
+  min_s: 1.0
+  max_s: 3.6
+  woerter_pro_s: 2.7            # deutsches Erzähltempo eleven_v3, gemessen an der Animationsprobe
+  vorlauf_s: 0.12
+  nachlauf_s: 0.18
+folge:
+  min_s: 60
+  max_s: 90
+kamera_arten: [ran, raus, links, rechts, hoch, runter, ruhig]
+
+# Darstellung
+schrift:
+  untertitel: assets/fonts/Anton-Regular.ttf
+  popup: assets/fonts/LuckiestGuy-Regular.ttf
+  anzeige: assets/fonts/Baloo2.ttf
+untertitel:
+  y: 0.66                       # Anteil der Bildhöhe (Mitte der Zeile)
+  groesse: 118
+  max_zeichen: 14               # 1–2 Wörter je Einblendung
+  farbe: "#FFFFFF"
+  wort_farbe: "#FF3B30"
+  kontur: 9
+popup:
+  groesse: 120
+  farbe: "#FFD400"
+  kontur: 10
+anzeige:
+  y: 0.16
+  groesse: 84
+  halten_s: 2.2                 # Anzeige bleibt nach einer Änderung so lange sichtbar
+partikel: 26
