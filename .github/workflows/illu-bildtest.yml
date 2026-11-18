@@ -36,6 +36,7 @@ jobs:
       - name: Bilder erzeugen (max. 0,86 €)
         env:
           RUNWAYML_API_SECRET: ${{ secrets.RUNWAYML_API_SECRET }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}   # nur für den Client-Aufbau, 0 Credits
           CSU_GIT_SYNC: "1"
         run: |
           PHRASE=$(python -c "import yaml;print(yaml.safe_load(open('config/budget.yaml'))['approval_phrase'])")
@@ -44,7 +45,7 @@ jobs:
       - name: Archiv sichern (nie doppelt bezahlen)
         if: always()
         run: |
-          git add assets/illu state 2>/dev/null || true
+          git add state; git add assets/illu 2>/dev/null || true
           git diff --cached --quiet || (git commit -q -m "Bildtest Weg 1: Bilder und Kasse" && git push -q) || true
       - name: Übersicht und Release (direkte Downloads)
         env:
