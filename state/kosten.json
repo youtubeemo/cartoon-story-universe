@@ -3,15 +3,7 @@
   "monate": {
     "2026-11": {
       "gebucht_eur": 5.0078,
-      "reservierungen": {
-        "44299560525": {
-          "eur": 0.86,
-          "seit": "2026-11-18T12:59:05+01:00",
-          "zweck": [
-            "Weg-1-Bilder die-letzten-10000 1: 0.86 €"
-          ]
-        }
-      },
+      "reservierungen": {},
       "posten": [
         {
           "zeit": "2026-11-18T00:52:19+01:00",
@@ -36,6 +28,14 @@
           "eur": 0.0,
           "credits": 3583.0,
           "notiz": "im Abo enthalten"
+        },
+        {
+          "zeit": "2026-11-18T12:59:56+01:00",
+          "run": "44299560525",
+          "anbieter": "nachbuchung",
+          "eur": 0.0,
+          "credits": null,
+          "notiz": "manuell nach Abrechnungskontrolle"
         }
       ],
       "limit_eur": 150.0
