@@ -7,3 +7,5 @@ ausgabe/
 *.mp4
 .env
 voices/
+out/
+cache/

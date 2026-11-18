@@ -1,0 +1,277 @@
+geschichte: die-letzten-10000
+teil: 1
+titel: "Das Erbe mit Haken"
+version: 4
+# STORYBOARD v4 (Weg 1, illustrierter Look) – Format siehe illu/storyboard.py und docs/STILBIBEL-ILLU.md.
+# Gleiche Handlung und gleiche Werte wie teil-01.yaml: Geld 0 → 10.000 → 8.500 €, Frist 30 → 29 Tage.
+
+shots:
+  - id: s01
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas in the middle of the bakery holding an opened letter, left half of him bathed in golden light with banknotes floating, right half in cold grey shadow with empty pockets turned out"
+    kamera: ran
+    fokus: [0.5, 0.42]
+    text: "Dieser Brief macht Jonas *reich*. Und pleite."
+    sfx: [papier]
+
+  - id: s02
+    ort: strasse
+    figuren: [jonas]
+    bild: "Jonas racing his courier bicycle down the cobblestone street towards the viewer, orange jacket flapping, backpack bouncing, big carefree grin, morning sun behind him"
+    kamera: ran
+    fokus: [0.5, 0.5]
+    text: "Das ist Jonas. Fahrradkurier."
+
+  - id: s03
+    ort: strasse
+    figuren: [jonas]
+    bild: "Close shot of Jonas holding up his open empty wallet, a single moth fluttering out of it, Jonas smiling sheepishly, shops blurred behind"
+    kamera: ran
+    fokus: [0.5, 0.45]
+    text: "Kontostand: genau *null* Euro."
+    zeige: [geld]
+
+  - id: s04
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas standing behind the old glass counter of the bakery, carefully holding a thick cream envelope with a red wax seal, flour dust glowing in warm morning light"
+    kamera: ran
+    fokus: [0.5, 0.48]
+    text: "Bis ein Brief vom Notar kommt."
+    sfx: [papier]
+
+  - id: s05
+    ort: backstube
+    figuren: [jonas]
+    bild: "Extreme close-up of Jonas's face reading the letter, eyes huge and sparkling, eyebrows shooting up, mouth falling open in disbelief"
+    kamera: ran
+    fokus: [0.5, 0.4]
+    text: "Oma Edith hat ihm alles vererbt."
+    emotion: ueberrascht
+
+  - id: s06
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas leaping high in the air inside the bakery with both fists up, the letter flying, a shower of banknotes raining down around him"
+    kamera: raus
+    fokus: [0.5, 0.4]
+    text: "*Zehntausend* Euro!"
+    emotion: begeistert
+    werte: {geld: {zu: 10000}}
+    popup: "+10.000 €"
+
+  - id: s07
+    ort: backstube
+    figuren: [jonas, aylin]
+    bild: "Jonas celebrating in the foreground clutching banknotes to his chest, behind him Aylin in her flour-dusted apron with crossed arms and one raised eyebrow"
+    kamera: rechts
+    fokus: [0.45, 0.42]
+    sprecher: jonas
+    text: "Ich bin *reich*!"
+    emotion: begeistert
+
+
+  - id: s07b
+    ort: backstube
+    figuren: [aylin]
+    bild: "Aylin pulling a tray of golden bread rolls out of the brass oven, flour on her arms, steam rising, confident half smile towards the viewer"
+    kamera: links
+    fokus: [0.5, 0.45]
+    text: "Aylin, Omas Bäckerin, sieht das anders."
+
+  - id: s08
+    ort: backstube
+    figuren: [aylin]
+    bild: "Close shot of Aylin tapping her finger firmly on the second page of the letter, serious unimpressed face, flour on her cheek"
+    kamera: ran
+    fokus: [0.5, 0.42]
+    sprecher: aylin
+    text: "Lies weiter."
+    emotion: skeptisch
+
+  - id: s09
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas reading the second page, his face turning pale, a big sweat drop on his forehead, his shadow stretching long and dark on the wall behind him"
+    kamera: ran
+    fokus: [0.5, 0.4]
+    text: "Zum Erbe gehört auch die Bäckerei."
+    emotion: besorgt
+
+  - id: s10
+    ort: backstube
+    figuren: []
+    bild: "A towering wobbly pile of red unpaid bills and overdue notices stacked on the bakery counter, reaching almost to the ceiling, dramatic low angle"
+    kamera: hoch
+    fokus: [0.5, 0.45]
+    text: "Mit *achtzehntausend* Euro Schulden."
+    zeige: [schulden]
+    sfx: [posaune]
+
+  - id: s11
+    ort: bank
+    figuren: [jonas]
+    bild: "Jonas sitting tiny on a low chair in front of a gigantic grey bank desk, a huge wall clock looming above, cold blue light, Jonas clutching his backpack"
+    kamera: ran
+    fokus: [0.5, 0.55]
+    text: "Die Bank gibt ihm dreißig Tage."
+    zeige: [tage]
+
+  - id: s12
+    ort: bank
+    figuren: []
+    bild: "Close-up of the big bank wall clock, the minute hand casting a long sharp shadow, cold blue light, dust in the air"
+    kamera: ran
+    fokus: [0.5, 0.4]
+    text: "Dann wird *gepfändet*."
+    sfx: [glocke]
+
+  - id: s13
+    ort: strasse
+    figuren: [grell]
+    bild: "A shiny purple limousine stopping in front of the shabby corner bakery, Grell stepping out of the back door with a smug grin, golden hour"
+    kamera: links
+    fokus: [0.5, 0.5]
+    text: "Und dann kommt Herr Grell."
+    sfx: [tuer]
+
+  - id: s14
+    ort: strasse
+    figuren: [grell]
+    bild: "Low angle close-up of Grell adjusting his purple tie, his gold fountain pen glinting, narrow scheming eyes looking at the bakery"
+    kamera: ran
+    fokus: [0.5, 0.38]
+    text: "Immobilienhai. Er will den *Laden*."
+
+
+  - id: s14b
+    ort: strasse
+    figuren: [grell]
+    bild: "Grell standing proudly in front of a row of boarded-up old shops while a huge wrecking ball swings behind him, dust clouds rising"
+    kamera: raus
+    fokus: [0.5, 0.5]
+    text: "Er kauft alte Läden – und lässt sie *abreißen*."
+    sfx: [posaune]
+
+  - id: s15
+    ort: backstube
+    figuren: [grell, jonas]
+    bild: "Grell leaning over the bakery counter sliding a contract and his gold pen towards Jonas, Jonas leaning back nervously behind the counter"
+    kamera: ran
+    fokus: [0.45, 0.45]
+    sprecher: grell
+    text: "Fünftausend Euro. *Heute*."
+    emotion: verschmitzt
+
+  - id: s16
+    ort: backstube
+    figuren: [aylin]
+    bild: "Aylin slamming a wooden rolling pin onto the counter, a cloud of flour exploding into the air, furious determined face"
+    kamera: ran
+    fokus: [0.5, 0.42]
+    sprecher: aylin
+    text: "Der Laden ist das *Zehnfache* wert!"
+    emotion: wuetend
+
+  - id: s17
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas behind the counter surrounded by swirling paper invoices for flour sacks and electricity, looking overwhelmed with his hands on his head"
+    kamera: raus
+    fokus: [0.5, 0.45]
+    text: "Erste Rechnungen: Mehl und Strom."
+    sfx: [papier]
+
+  - id: s18
+    ort: backstube
+    figuren: []
+    bild: "Close-up of an old brass cash register with its drawer springing open, only a few lonely coins rattling inside"
+    kamera: ran
+    fokus: [0.5, 0.5]
+    text: "*Fünfzehnhundert* Euro weg."
+    werte: {geld: {delta: -1500}}
+    popup: "-1.500 €"
+
+  - id: s19
+    ort: strasse
+    figuren: []
+    bild: "The corner bakery at dusk, the sun sinking behind the rooftops, long purple shadows, the faded awning and the first street lamps flickering on"
+    kamera: runter
+    fokus: [0.5, 0.5]
+    text: "Ein Tag ist schon vorbei."
+    werte: {tage: {delta: -1}}
+
+  - id: s20
+    ort: backstube
+    figuren: []
+    bild: "The big old brass bakery oven with thick black smoke bursting out of its door, sparks flying, a warning light blinking red"
+    kamera: ran
+    fokus: [0.5, 0.48]
+    text: "Dann stirbt der alte *Ofen*."
+    sfx: [posaune]
+
+
+  - id: s20b
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas staring at a glossy catalogue showing a shiny new chrome bakery oven, the oven reflected in his wide eyes"
+    kamera: ran
+    fokus: [0.5, 0.42]
+    text: "Ein neuer Ofen kostet *viertausend* Euro."
+    emotion: besorgt
+
+  - id: s21
+    ort: backstube
+    figuren: [aylin, jonas]
+    bild: "Aylin and Jonas standing in front of the dead oven, faces covered in black soot, coughing, smoke curling around them"
+    kamera: ran
+    fokus: [0.4, 0.45]
+    sprecher: aylin
+    text: "Ohne Ofen kein Brot. Ohne Brot kein *Geld*."
+    emotion: besorgt
+
+  - id: s22
+    bild_von: s21
+    kamera: rechts
+    fokus: [0.6, 0.42]
+    sprecher: jonas
+    text: "Und ohne Geld kein *Ofen*."
+    emotion: traurig
+
+  - id: s23
+    ort: strasse
+    figuren: [grell]
+    bild: "Grell at night under a lone street lamp outside the bakery door, bending down to slide a golden business card under the door, sly grin"
+    kamera: ran
+    fokus: [0.5, 0.5]
+    sprecher: grell
+    text: "Mein Angebot gilt bis *Mitternacht*."
+    emotion: verschmitzt
+
+
+  - id: s23b
+    ort: backstube
+    figuren: []
+    bild: "The old round wall clock of the bakery at night showing a few minutes before midnight, moonlight falling across it, flour dust in the beam"
+    kamera: ran
+    fokus: [0.5, 0.4]
+    text: "Die Uhr *tickt*."
+    sfx: [glocke]
+
+  - id: s24
+    ort: backstube
+    figuren: [jonas]
+    bild: "Jonas alone in the dark bakery at night holding Grell's golden business card, moonlight through the shop window, the broken oven looming behind him"
+    kamera: ran
+    fokus: [0.5, 0.45]
+    text: "Was soll Jonas tun? Eins, zwei oder drei? Schreib es in die Kommentare!"
+    entscheidung: true
+
+entscheidung:
+  frage: "Was soll Jonas tun?"
+  optionen:
+    1: {text: "Neuen Ofen kaufen (4.000 €)", effekte: {geld: -4000}}
+    2: {text: "Mit Aylin reparieren (600 €, 2 Tage)", effekte: {geld: -600, tage: -2}}
+    3: {text: "Zur Bank: Aufschub (1 Tag)", effekte: {tage: -1}}
+  standard: 2
