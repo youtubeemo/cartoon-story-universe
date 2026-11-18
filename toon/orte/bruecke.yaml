@@ -1,0 +1,11 @@
+titel: Kommandobrücke
+bodenfarbe: "#4A5468"
+tageslicht: false
+sitze: {pilotensitz: 720}
+eingang_links: -140
+elemente:
+  - {typ: wand, farbe: "#C9D3DE", muster: metall}
+  - {typ: fenster, x: 300, y: 260, w: 840, rund: true, rahmen: "#5A6478"}
+  - {typ: konsole, x: 370, w: 700}
+  - {typ: boden, art: metall, farbe: "#4A5468"}
+  - {typ: stuhl, x: 720, farbe: "#E4572E"}

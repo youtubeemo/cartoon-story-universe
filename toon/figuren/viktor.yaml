@@ -1,0 +1,13 @@
+name: Viktor von Lindt
+geschichte: das-haus-am-nebelsee
+groesse: 1.04
+koerper: schlank
+haut: "#F0D2BE"
+augen: "#2B2B2B"
+haare: {stil: kurz, farbe: "#1B1B1F"}
+monokel: true
+oberteil: "#2E6B4A"
+krawatte: "#C9A04A"
+hose: "#2E6B4A"
+schuhe: "#1B1B1F"
+stimme: {piper: de_DE-thorsten-high, pitch: 1.05}

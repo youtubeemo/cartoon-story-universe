@@ -1,0 +1,11 @@
+titel: Der Drachenimbiss
+bodenfarbe: "#7FB069"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel}
+  - {typ: huegel, x: -200, w: 1000, h: 420, farbe: "#9ED29A"}
+  - {typ: huegel, x: 700, w: 1000, h: 320, farbe: "#7FB069"}
+  - {typ: marktstand, x: 420, w: 700}
+  - {typ: kessel, x: 220}
+  - {typ: boden, art: gras, farbe: "#7FB069"}

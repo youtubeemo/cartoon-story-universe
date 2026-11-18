@@ -1,0 +1,90 @@
+# Tagesfolge mit der 2D-Pipeline (toon): Abstimmung → Drehbuch (Claude, falls nötig) → Logikprüfung →
+# ElevenLabs-Stimmen (Abo, Credit-Grenze je Folge) → Lippensync → Render → Qualitätskontrolle → Release.
+# Runway wird NICHT verwendet. Täglicher Zeitplan bleibt aus, bis er ausdrücklich freigegeben ist.
+name: Tagesfolge 2D
+
+on:
+  workflow_dispatch:
+    inputs:
+      geschichte:
+        description: "Geschichte (Slug)"
+        required: true
+      stimmen:
+        description: "elevenlabs oder piper"
+        required: true
+        type: choice
+        options: [elevenlabs, piper]
+      bestaetigung:
+        description: "Bestätigungsphrase (config/budget.yaml)"
+        required: false
+      youtube_video_id:
+        required: false
+      tiktok_stimmen:
+        required: false
+  # schedule:                    # erst nach ausdrücklicher Freigabe einkommentieren (zusätzlich taeglich_aktiv: true)
+  #   - cron: "17 3 * * *"
+  #   - cron: "17 4 * * *"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: produktion
+  cancel-in-progress: false
+
+jobs:
+  folge:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Werkzeuge
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core >/dev/null
+          pip install -q -r requirements.txt piper-tts==1.8.0
+          bash scripts/storyhouse_holen.sh
+      - uses: actions/cache@v4
+        with: {path: voices, key: piper-voices-v1}
+      - name: Rhubarb Lip Sync (Prüfsumme)
+        run: |
+          URL=$(python -c "import yaml;print(yaml.safe_load(open('config/rhubarb.yaml'))['url'])")
+          SHA=$(python -c "import yaml;print(yaml.safe_load(open('config/rhubarb.yaml'))['sha256'])")
+          curl -fsSL --retry 3 "$URL" -o /tmp/rhubarb.zip && echo "$SHA  /tmp/rhubarb.zip" | sha256sum -c -
+          unzip -q /tmp/rhubarb.zip -d "$HOME/rhubarb"
+          BIN=$(find "$HOME/rhubarb" -type f -name rhubarb | head -n 1); chmod +x "$BIN"; echo "RHUBARB_BIN=$BIN" >> "$GITHUB_ENV"
+      - name: Folge produzieren
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CSU_GIT_SYNC: "1"
+          G: ${{ inputs.geschichte }}
+          ST: ${{ inputs.stimmen }}
+          BE: ${{ inputs.bestaetigung }}
+          YT: ${{ inputs.youtube_video_id }}
+          TT: ${{ inputs.tiktok_stimmen }}
+          GEPLANT: ${{ github.event_name == 'schedule' && '--geplant' || '' }}
+        run: |
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
+          TZ=Europe/Berlin python -m toon folge --geschichte "$G" --stimmen "$ST" --bestaetigung "$BE" \
+            --youtube-video-id "$YT" --tiktok-stimmen "$TT" $GEPLANT --out ausgabe/folge
+      - name: Stand, Storyboards, Stimmen-Archiv sichern
+        if: always()
+        run: |
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
+          git add state stories assets 2>/dev/null || true
+          git diff --cached --quiet || (git commit -q -m "Tagesfolge 2D: Stand und Archiv" && git push -q) || true
+      - name: Release (direkter MP4-Download) + Benachrichtigung
+        if: success() && hashFiles('ausgabe/folge/release.json') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          R=ausgabe/folge/release.json
+          TAG=$(jq -r .tag $R); TITEL=$(jq -r .titel $R); DATEI=$(jq -r .datei $R); NAME=$(jq -r .dateiname $R)
+          python -c "import json;b=json.load(open('ausgabe/folge/bericht.json'));print('\n'.join(f'- {k}: {v}' for k,v in b.items() if k!='endwerte'))" > notiz.txt
+          gh release create "$TAG" "$DATEI" --title "$TITEL" --notes-file notiz.txt
+          gh issue create --title "🎬 $TITEL" --body "https://github.com/${{ github.repository }}/releases/download/$TAG/$NAME" || true

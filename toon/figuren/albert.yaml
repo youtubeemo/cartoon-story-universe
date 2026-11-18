@@ -1,0 +1,14 @@
+name: Albert
+geschichte: das-haus-am-nebelsee
+groesse: 1.12
+koerper: schlank
+haut: "#EBCDB7"
+augen: "#3B2A20"
+haare: {stil: glatze, farbe: "#E8E8E8", brauen: "#E8E8E8"}
+backenbart: "#EDEDED"
+oberteil: "#1F1F26"
+weste: "#FFFFFF"
+krawatte: "#1F1F26"
+hose: "#1F1F26"
+schuhe: "#1B1B1F"
+stimme: {piper: de_DE-thorsten-high, pitch: 0.9}

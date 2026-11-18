@@ -1,0 +1,12 @@
+titel: Dschungel
+bodenfarbe: "#5E8C3A"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: wand, farbe: "#2F6B3A", muster: keins}
+  - {typ: wasserfall, x: 820, y0: 500, y1: 1700}
+  - {typ: baum, x: 160, h: 1500, farbe: "#3A7D44"}
+  - {typ: baum, x: 1280, h: 1400, farbe: "#2E8B57"}
+  - {typ: busch, x: 520, farbe: "#4E9A55"}
+  - {typ: boden, art: gras, farbe: "#5E8C3A"}
+  - {typ: felsen, x: 600, w: 260, h: 140, y1: 1950}

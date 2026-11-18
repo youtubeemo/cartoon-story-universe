@@ -1,0 +1,12 @@
+titel: Altstadtgasse
+bodenfarbe: "#A7A39C"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel}
+  - {typ: haus, x: -40, w: 560, h: 1150, farbe: "#E9C46A", dach: "#B5543B", tuer_x: 300, markise: "#2EC4B6"}
+  - {typ: haus, x: 520, w: 460, h: 1300, farbe: "#F4A9A8", dach: "#6B3E26"}
+  - {typ: haus, x: 980, w: 500, h: 1050, farbe: "#9ED29A", dach: "#3E4F6E", tuer_x: 150}
+  - {typ: boden, art: pflaster, farbe: "#A7A39C"}
+  - {typ: laterne, x: 1250}
+  - {typ: baum, x: 160, h: 620, farbe: "#E9A23B"}

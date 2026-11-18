@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from toon.figur import Figur
+from toon.tiere import figur_fuer
 from toon.geo import Pen
 from toon.orte import BODEN_Y, ORTE
 
@@ -23,7 +23,7 @@ FADE = 0.4
 def _init(tl):
     global _TL, _FIG
     _TL = tl
-    _FIG = {n: Figur(d) for n, d in tl["figuren"].items()}
+    _FIG = {n: figur_fuer(d) for n, d in tl["figuren"].items()}
 
 
 def _einstellung(t: float):
@@ -42,17 +42,21 @@ def _hintergrund(e):
     return _BG[e.nr]
 
 
+def _partner(e, name: str):
+    """Nächste andere Figur auf der Bühne (für Zuwendung im Gespräch)."""
+    def fn(t):
+        me = _TL["spuren"][name].x(t)
+        xs = [_TL["spuren"][o].x(t) for o in e.figuren if o != name]
+        xs = [x for x in xs if -150 < x < 1590]
+        return min(xs, key=lambda x: abs(x - me)) if xs else None
+    return fn
+
+
 def _blickziel(e, name: str, t: float):
-    ziel = e.blick.get(name)
-    if ziel == "kamera":
-        return None
-    if ziel in e.figuren:
-        return e.figuren[ziel]["x"]
-    for other, sp in _TL["spuren"].items():          # wer gerade spricht, wird angesehen
-        if other != name and other in e.figuren and any(a <= t < b for a, b in sp.sprechen):
-            return e.figuren[other]["x"]
-    others = [o for o in e.figuren if o != name]
-    return e.figuren[others[0]]["x"] if others else None
+    for o in e.figuren:                       # wer gerade spricht, wird angesehen
+        if o != name and _TL["spuren"][o].spricht(t):
+            return _TL["spuren"][o].x(t)
+    return _partner(e, name)(t)
 
 
 def bild(f: int, fps: int = 30) -> bytes:
@@ -62,9 +66,11 @@ def bild(f: int, fps: int = 30) -> bytes:
     img = bg.copy()
     pen = Pen(img, e.view(SS))
     pen.boden = boden
-    for name in sorted(e.figuren, key=lambda n: e.figuren[n]["x"]):
-        pos = e.figuren[name]
-        z = _TL["spuren"][name].zustand(t, pos["x"], pos.get("y", BODEN_Y), _blickziel(e, name, t), pos.get("s", 1.0))
+    for name in sorted(e.figuren, key=lambda n: _TL["spuren"][n].x(t)):
+        sp = _TL["spuren"][name]
+        if not -320 < sp.x(t) < 1760:
+            continue
+        z = sp.zustand(t, BODEN_Y, _partner(e, name), _blickziel(e, name, t))
         _FIG[name].zeichne(pen, z)
     out = img.reduce(SS)
     # Blenden (Abblende / Überblendung über Schwarz)

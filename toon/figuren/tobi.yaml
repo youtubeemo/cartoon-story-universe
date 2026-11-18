@@ -1,0 +1,14 @@
+name: Tobi
+geschichte: die-karte-der-sieben-gipfel
+groesse: 0.88
+koerper: normal
+haut: "#E8B98F"
+augen: "#3B2A20"
+haare: {stil: kurz, farbe: "#6B4A2A"}
+brille: {art: schweiss, farbe: "#3A3A44"}
+oberteil: "#4A6FA5"
+schuerze: "#4A6FA5"
+hose: "#4A6FA5"
+schuhe: "#5A3A2A"
+schulter_vogel: "#3FA34D"
+stimme: {piper: de_DE-thorsten_emotional-medium, sprecher: amused, pitch: 1.1}

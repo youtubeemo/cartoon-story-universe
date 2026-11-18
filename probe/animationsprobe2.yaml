@@ -1,0 +1,48 @@
+# Animationsprobe 2 – „Die letzten 10.000 €“: Grells Angebot (≤ 20 s).
+# Zeigt: Auftritt mit Gehen (Profil), Drehen zum Gesprächspartner, Aufstehen, Übergabe Hand zu Hand,
+# Abgang, Hinsetzen, Mimik/Gestik, ElevenLabs-Stimmen mit Lippensync, Geräusche, Musik.
+titel: "Grells Angebot"
+geschichte: die-letzten-10000
+musik: {stimmung: verschmitzt}
+einstellungen:
+  - nr: 1
+    ort: backstube
+    tageszeit: tag
+    kamera: halbtotale
+    uebergang: abblende
+    fokus: [aylin, jonas]
+    figuren:
+      aylin: {x: 170}
+      jonas: {x: 470, sitzt: true, requisit: brief}
+      grell: {x: 1320, requisit: karte}
+    ablauf:
+      - {sfx: glocke, pause: 0.3}
+      - {figur: jonas, ausdruck: ueberrascht, parallel: true}
+      - {figur: grell, geht_nach: 960, ausdruck: verschmitzt}
+      - {figur: grell, sagt: "Ich kaufe den Laden. Fünftausend Euro.", ausdruck: verschmitzt}
+      - {figur: jonas, steht_auf: true, legt_ab: true, ausdruck: wuetend}
+      - {figur: jonas, sagt: "Omas Bäckerei? Niemals!", ausdruck: wuetend, aktion: stampfen}
+  - nr: 2
+    ort: backstube
+    tageszeit: tag
+    kamera: halbnah
+    uebergang: schnitt
+    fokus: [jonas, grell]
+    figuren: {aylin: {}, jonas: {}, grell: {}}
+    ablauf:
+      - {figur: grell, geht_zu: jonas}
+      - {figur: grell, gibt: {an: jonas, requisit: karte}, sagt: "Bis Mitternacht, Junge.", ausdruck: verschmitzt}
+      - {figur: jonas, haltung: karte_ansehen, ausdruck: besorgt, pause: 0.6}
+  - nr: 3
+    ort: backstube
+    tageszeit: tag
+    kamera: halbtotale
+    uebergang: schnitt
+    fokus: [aylin, jonas]
+    nachlauf: 0.8
+    figuren: {aylin: {}, jonas: {}, grell: {}}
+    ablauf:
+      - {figur: grell, geht_ab: rechts, parallel: true}
+      - {sfx: glocke, warte: 2.2, parallel: true}
+      - {figur: aylin, haltung: arme_verschraenkt, ausdruck: skeptisch, sagt: "Der kommt wieder.", warte: 0.5}
+      - {figur: jonas, setzt_sich: hocker, ausdruck: traurig, aktion: seufzen}

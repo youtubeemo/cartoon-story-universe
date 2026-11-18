@@ -1,0 +1,13 @@
+name: Mila
+geschichte: insel-nr-7
+groesse: 1.0
+koerper: normal
+haut: "#F4D0B5"
+augen: "#3A6EA5"
+haare: {stil: kurz, farbe: "#F2C14E", brauen: "#C9952E"}
+brille: {art: flieger, farbe: "#5A3A2A"}
+oberteil: "#6B7F3A"
+guertel: "#5A3A2A"
+hose: "#6B7F3A"
+schuhe: "#4A3A2A"
+stimme: {piper: de_DE-kerstin-low}

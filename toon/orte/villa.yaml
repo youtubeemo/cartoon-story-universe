@@ -1,0 +1,12 @@
+titel: Villa am Nebelsee (außen)
+bodenfarbe: "#6C7A6A"
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel, zeit: nacht}
+  - {typ: wasser, y0: 1400, y1: 1720, farbe: "#3E4F6E"}
+  - {typ: haus, x: 360, w: 760, h: 1250, y1: 1400, farbe: "#5A5A72", dach: "#2B2B44", tuer_x: 280}
+  - {typ: baum, x: 150, h: 900, kahl: true}
+  - {typ: steg, x: 900, w: 560, y: 1760}
+  - {typ: boden, art: gras, farbe: "#6C7A6A", y0: 1720}
+  - {typ: laterne, x: 1200, y1: 1800}

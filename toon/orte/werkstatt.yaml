@@ -1,0 +1,11 @@
+titel: Uhrmacherwerkstatt
+bodenfarbe: "#8A6A4A"
+sitze: {hocker: 520}
+eingang_rechts: 1580
+elemente:
+  - {typ: wand, farbe: "#E9DCC6", muster: holz}
+  - {typ: uhrenwand}
+  - {typ: boden, art: holz, farbe: "#8A6A4A"}
+  - {typ: werkbank, x: 340, w: 760}
+  - {typ: lampe, x: 720, farbe: "#C9A04A"}
+  - {typ: hocker, x: 520}

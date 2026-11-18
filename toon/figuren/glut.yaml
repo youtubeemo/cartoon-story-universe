@@ -1,0 +1,7 @@
+name: Glut
+geschichte: der-drachenimbiss
+typ: drache
+schuppen: "#F28B26"
+bauch: "#FFE0A3"
+fluegel: "#E4572E"
+stimme: {piper: de_DE-thorsten_emotional-medium, sprecher: amused, pitch: 1.35}

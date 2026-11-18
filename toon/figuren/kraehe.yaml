@@ -1,0 +1,14 @@
+name: Piratin Krähe
+geschichte: die-karte-der-sieben-gipfel
+groesse: 1.06
+koerper: schlank
+haut: "#E6C2A8"
+augen: "#2B2B2B"
+haare: {stil: lang, farbe: "#1B1B1F"}
+augenklappe: true
+oberteil: "#2B2B33"
+mantel: "#1F1F26"
+guertel: "#8E2B3A"
+hose: "#2B2B33"
+schuhe: "#1B1B1F"
+stimme: {piper: de_DE-kerstin-low, pitch: 0.92}

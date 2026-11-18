@@ -1,0 +1,10 @@
+titel: Turmzimmer
+bodenfarbe: "#7A6A5A"
+eingang_links: -140
+elemente:
+  - {typ: wand, farbe: "#8A7E70", muster: stein}
+  - {typ: fenster, x: 540, y: 380, w: 360, h: 520, zeit: nacht}
+  - {typ: tuer, x: 1080, farbe: "#4A2A1A", w: 300, h: 700}
+  - {typ: kaefig, x: 300, y: 700}
+  - {typ: boden, art: holz, farbe: "#7A6A5A"}
+  - {typ: stuhl, x: 760, farbe: "#6B3E26"}

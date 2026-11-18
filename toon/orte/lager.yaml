@@ -1,0 +1,11 @@
+titel: Lager am Strand
+bodenfarbe: "#F2D79B"
+sitze: {stamm: 400}
+eingang_links: -140
+elemente:
+  - {typ: himmel}
+  - {typ: wasser, y0: 1350, y1: 1720}
+  - {typ: boden, art: sand, farbe: "#F2D79B", y0: 1720}
+  - {typ: palme, x: 1250, h: 950}
+  - {typ: feuer, x: 820, y: 1950}
+  - {typ: hocker, x: 400, farbe: "#7A4E2D"}

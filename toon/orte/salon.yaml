@@ -1,0 +1,13 @@
+titel: Salon der Villa
+bodenfarbe: "#6B3E26"
+sitze: {sessel: 1080}
+eingang_links: -140
+elemente:
+  - {typ: wand, farbe: "#6B2E3A", muster: tapete, akzent: "#7E3A47"}
+  - {typ: boden, art: teppich, farbe: "#6B3E26"}
+  - {typ: kamin, x: 460}
+  - {typ: bild, x: 140, y: 420}
+  - {typ: bild, x: 1080, y: 420, farbe: "#2B3F73"}
+  - {typ: standuhr, x: 1180}
+  - {typ: lampe, x: 720, farbe: "#C9A04A"}
+  - {typ: stuhl, x: 1080, farbe: "#8E2B3A"}

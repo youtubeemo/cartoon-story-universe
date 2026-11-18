@@ -1,0 +1,14 @@
+titel: Omas Bäckerei (innen)
+bodenfarbe: "#B9825A"
+sitze: {hocker: 470}
+eingang_rechts: 1560
+elemente:
+  - {typ: wand, farbe: "#F3E3C3", muster: streifen}
+  - {typ: boden, art: holz, farbe: "#B9825A"}
+  - {typ: fenster, x: 560, y: 390, w: 400, h: 600}
+  - {typ: ofen, x: 70}
+  - {typ: regal, x: 1040, y: 420, w: 380, inhalt: brot}
+  - {typ: theke, x: 520, w: 940}
+  - {typ: lampe, x: 380}
+  - {typ: lampe, x: 1100}
+  - {typ: hocker, x: 470}

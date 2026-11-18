@@ -1,0 +1,11 @@
+titel: Station Kepler-9 (außen)
+bodenfarbe: "#5A6478"
+tageslicht: false
+eingang_links: -140
+eingang_rechts: 1580
+elemente:
+  - {typ: himmel, zeit: nacht, sonne: false}
+  - {typ: planet, x: 1050, y: 700, r: 520}
+  - {typ: wand, farbe: "#C9D3DE", muster: metall, y1: 0}
+  - {typ: boden, art: metall, farbe: "#5A6478", y0: 1700}
+  - {typ: luke, x: 120}
