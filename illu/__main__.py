@@ -190,9 +190,15 @@ def cmd_bilder(a) -> int:
     try:
         lauf.reservieren(a.max_eur, f"Weg-1-Bilder {a.slug} {a.teil}")
         clients = lauf.clients(p.credits("runway"), 0, False, a.max_eur)   # SpendGuard: harte Grenze
-        files = run_jobs(p, clients, Path(a.out) / "roh", ROOT / "cache" / "illu")
+        # Zwischenspeicher im Archivordner: wird vom Workflow immer committet → bezahlte Bilder gehen nie verloren
+        files = run_jobs(p, clients, Path(a.out) / "roh", bplan.ARCHIV / a.slug / "cache")
     except STOPP as exc:
         lauf.stopp(exc)
+    except Exception:                       # unerwarteter Fehler: bisher Ausgegebenes trotzdem buchen
+        if getattr(lauf, "guards", None):
+            lauf.kasse.buchen(lauf.run, "runway", lauf.guards[0].spent_eur, None, "Abbruch (unerwarteter Fehler)")
+            lauf.kasse.aufloesen(lauf.run)
+        raise
     for x in auftr:
         if x.id in files and not x.datei.exists():
             x.datei.parent.mkdir(parents=True, exist_ok=True)
