@@ -2,16 +2,8 @@
   "version": 2,
   "monate": {
     "2026-11": {
-      "gebucht_eur": 5.1078,
-      "reservierungen": {
-        "44300248316": {
-          "eur": 0.77,
-          "seit": "2026-11-18T13:03:58+01:00",
-          "zweck": [
-            "Weg-1-Bilder die-letzten-10000 1: 0.77 €"
-          ]
-        }
-      },
+      "gebucht_eur": 5.8694,
+      "reservierungen": {},
       "posten": [
         {
           "zeit": "2026-11-18T00:52:19+01:00",
@@ -52,6 +44,14 @@
           "eur": 0.1,
           "credits": null,
           "notiz": "manuell nach Abrechnungskontrolle"
+        },
+        {
+          "zeit": "2026-11-18T13:08:40+01:00",
+          "run": "44300248316",
+          "anbieter": "runway",
+          "eur": 0.76,
+          "credits": 64.0,
+          "notiz": "Weg-1-Bilder die-letzten-10000 1"
         }
       ],
       "limit_eur": 150.0
