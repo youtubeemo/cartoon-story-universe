@@ -3,7 +3,15 @@
   "monate": {
     "2026-11": {
       "gebucht_eur": 5.0078,
-      "reservierungen": {},
+      "reservierungen": {
+        "44299734889": {
+          "eur": 0.86,
+          "seit": "2026-11-18T13:00:12+01:00",
+          "zweck": [
+            "Weg-1-Bilder die-letzten-10000 1: 0.86 €"
+          ]
+        }
+      },
       "posten": [
         {
           "zeit": "2026-11-18T00:52:19+01:00",
