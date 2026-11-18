@@ -5,7 +5,18 @@
       "3D-/Plastik-Look; zwei Ansichten mit unterschiedlichem Hautton; Buchstaben-Logo auf der Jacke"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "9acf5c2aaf679500d130a6277ee086e09e65a00066a5fce0fc096e8ffcb9c23f",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "3D-/Plastik-Look; zwei Ansichten mit unterschiedlichem Hautton; Buchstaben-Logo auf der Jacke"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "ref_aylin.png": {
     "status": "fehler",
@@ -13,7 +24,18 @@
       "3D-/Plastik-Look; die zwei Ansichten weichen ab (Schuhe, Schürze)"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "47243238a0ddcc610fc5d5870566536c60b5db2e22cf822c4aa5a0ad2be55e78",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "3D-/Plastik-Look; die zwei Ansichten weichen ab (Schuhe, Schürze)"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "ref_grell.png": {
     "status": "fehler",
@@ -21,7 +43,18 @@
       "3D-/Plastik-Look; Hautfarbe widerspricht der Charakterbibel (hell)"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "0a2f7d8d13eebdcd3b895bf0603ab5b18d159da28b75dfd828b56112e8c00455",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "3D-/Plastik-Look; Hautfarbe widerspricht der Charakterbibel (hell)"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "ref_backstube.png": {
     "status": "fehler",
@@ -29,7 +62,18 @@
       "Fantasieschrift im Fenster; Gesichter auf Broten; Puppenköpfe im Regal – zu viel für Retusche"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "043db4fa2e2e03d732725453ca2ff82fdecec8750b84590ff88d4743e4e91c42",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "Fantasieschrift im Fenster; Gesichter auf Broten; Puppenköpfe im Regal – zu viel für Retusche"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "ref_strasse.png": {
     "status": "fehler",
@@ -37,7 +81,18 @@
       "Fantasieschrift auf drei Schildern (Original)"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "4af0ef398917107d21a130025231d2fe1a0f442044cd283613fde875fd35635c",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "Fantasieschrift auf drei Schildern (Original)"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "ref_strasse.ret.png": {
     "status": "manuell_ok",
@@ -45,7 +100,18 @@
       "Schrift lokal entfernt; 2D-Stil, keine Figuren – als Ortsreferenz und Stilanker freigegeben"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:38"
+    "zeit": "2026-11-18T13:39:38",
+    "sha256": "6f396b8b4dfb166543e153bf3f849e3b305abfc27c0ae7c0e0db7fe21ddea633",
+    "verlauf": [
+      {
+        "status": "manuell_ok",
+        "gruende": [
+          "Schrift lokal entfernt; 2D-Stil, keine Figuren – als Ortsreferenz und Stilanker freigegeben"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:38"
+      }
+    ]
   },
   "stil_anker.png": {
     "status": "manuell_ok",
@@ -53,7 +119,18 @@
       "Kopie von ref_strasse.ret.png"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:39"
+    "zeit": "2026-11-18T13:39:39",
+    "sha256": "6f396b8b4dfb166543e153bf3f849e3b305abfc27c0ae7c0e0db7fe21ddea633",
+    "verlauf": [
+      {
+        "status": "manuell_ok",
+        "gruende": [
+          "Kopie von ref_strasse.ret.png"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:39"
+      }
+    ]
   },
   "59dd1b49bdb65bfdaa5a.png": {
     "status": "fehler",
@@ -61,7 +138,18 @@
       "s13: Grells Hautfarbe widerspricht der Charakterbibel; Fantasieschrift auf Schildern"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:39"
+    "zeit": "2026-11-18T13:39:39",
+    "sha256": "5e0769374d98f030042bbbe9008403edf0772beb94e4693acf0f14211da23bdd",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "s13: Grells Hautfarbe widerspricht der Charakterbibel; Fantasieschrift auf Schildern"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:39"
+      }
+    ]
   },
   "5001f3f3b8b860d1e8a3.png": {
     "status": "fehler",
@@ -69,7 +157,18 @@
       "s15: Jonas als Kind mit schwarzen Haaren statt 21 Jahre/rote Locken; Fantasieschrift"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:39"
+    "zeit": "2026-11-18T13:39:39",
+    "sha256": "105a76236bfc8262360e4ea5b047e570adcd127137385180174b13ffcf70b456",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "s15: Jonas als Kind mit schwarzen Haaren statt 21 Jahre/rote Locken; Fantasieschrift"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:39"
+      }
+    ]
   },
   "608959825ff9958f1469.png": {
     "status": "fehler",
@@ -77,7 +176,18 @@
       "s21: Gesichter auf Broten, Fantasieschrift ATAN, Logo auf Jacke"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:39"
+    "zeit": "2026-11-18T13:39:39",
+    "sha256": "9618248725d6ba4d7e3f785f5b74342735a846789932a2962f929e771517027f",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "s21: Gesichter auf Broten, Fantasieschrift ATAN, Logo auf Jacke"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:39"
+      }
+    ]
   },
   "608959825ff9958f1469.ret.png": {
     "status": "vorbehalt",
@@ -85,6 +195,17 @@
       "s21 retuschiert: Brot, Schrift, Logo entfernt; Jonas passt zur Bibel; Aylins Haut dunkler als Bibel; vor Verwendung gegen neue Referenzen prüfen"
     ],
     "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
-    "zeit": "2026-11-18T13:39:39"
+    "zeit": "2026-11-18T13:39:39",
+    "sha256": "2a4416bf1d0d335a1d46fc66226352262c3513bd2c41adf4431253bf63bdceed",
+    "verlauf": [
+      {
+        "status": "vorbehalt",
+        "gruende": [
+          "s21 retuschiert: Brot, Schrift, Logo entfernt; Jonas passt zur Bibel; Aylins Haut dunkler als Bibel; vor Verwendung gegen neue Referenzen prüfen"
+        ],
+        "quelle": "manuell (Claude, Sichtprüfung 18.11.2026)",
+        "zeit": "2026-11-18T13:39:39"
+      }
+    ]
   }
 }

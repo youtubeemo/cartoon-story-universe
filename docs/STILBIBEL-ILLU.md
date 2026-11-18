@@ -96,8 +96,24 @@ das ist rechtlich nicht sauber und wird nicht gemacht. Stattdessen dient ein **e
 (`assets/illu/die-letzten-10000/stil_anker.png`, retuschierte Straßenreferenz). Wenn du eigene Bilder aus einem
 selbst erstellten Video hast, können sie als Stilanker eingetragen werden.
 
+## Sicherheit der Freigaben
+
+* **Kostenlimit inkl. KI-Prüfung:** Runway bekommt als harte Grenze das Limit minus die Obergrenze der KI-Prüfung.
+  Danach darf die KI nur noch ausgeben, was nach den *tatsächlichen* Runway-Kosten übrig ist (`qc.KIBudget`): vor
+  jedem Aufruf wird dessen höchstmöglicher Preis (Text ≤ 2.500, je Bild ≤ 1.600 Eingabe-Tokens, ≤ 600 Ausgabe-
+  Tokens) vorgemerkt; reicht der Rest nicht, wird nicht geprüft und das Bild bleibt gesperrt. Fehlerhafte Aufrufe
+  werden mit dem Höchstpreis verbucht, nie wiederholt.
+* **Manuelle Urteile:** `--wer` und `--grund` Pflicht; ein Bild mit Status „fehler“ nur mit `--trotz-fehler`.
+  Jedes Urteil ist an die SHA-256-Prüfsumme der Datei gebunden (ausgetauschte Datei → wieder „ungeprüft“) und
+  bleibt im Verlauf erhalten.
+* **Referenzen:** Eintrag in `referenzen.yaml` nur über `python -m illu referenz SLUG TAG DATEI` (Dateiname muss
+  zum Tag passen, QC-Status ok, Prüfsumme wird notiert). Vor jedem Lauf wird der Status jeder festen Referenz erneut
+  geprüft.
+
 ## Offen bis zur Freigabe
 
+* Workflow „Bildtest Weg 1 – Referenzen“ (`illu-referenztest.yml`): startet nur manuell mit Freigabephrase, fest
+  eingetragenes Limit 0,46 € (vier Referenzen 0,38 € + KI-Prüfung höchstens 0,07 €).
 * Zweiter Bildtest in zwei Phasen: 4 neue Referenzen (Jonas, Aylin, Grell, Backstube) ≈ 0,38 € + KI-Prüfung
   ≈ 0,08 €; danach 3 Shots ≈ 0,29 € + KI-Prüfung ≈ 0,06 €; zusammen ≈ 0,81 €.
 * Erst danach lässt sich beurteilen, ob 2D-Stil, gleiches Alter und gleiche Gesichtszüge wirklich erreicht werden.

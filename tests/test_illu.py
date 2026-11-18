@@ -143,3 +143,90 @@ def test_retusche_entfernt_details_und_laesst_flaeche():
     out = flicken(img, [100, 70, 200, 130])
     assert np.abs(out[100, 150].astype(int) - (60, 140, 200)).max() < 25
     assert (out[0, 0] == img[0, 0]).all()
+
+
+# ---------------------------------------------------------------- Sicherheit: KI-Kostengrenze, Freigaben
+def test_ki_pruefung_ueberschreitet_limit_nie(tmp_path, monkeypatch):
+    import io
+    import json as js
+    from illu import qc
+    story, sb, _ = _daten()
+    b = tmp_path / "s.png"
+    Image.new("RGB", (1080, 1920)).save(b)
+    aufrufe = []
+
+    def fake_urlopen(req, timeout=0):
+        aufrufe.append(1)
+        antwort = {"content": [{"type": "text", "text": "{}"}], "usage": {"input_tokens": 3000, "output_tokens": 200}}
+        return io.BytesIO(js.dumps(antwort).encode())
+
+    class Ctx(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
+    monkeypatch.setattr(qc.urllib.request, "urlopen", lambda req, timeout=0: Ctx(fake_urlopen(req).getvalue()))
+    grenze = qc.ki_obergrenze_eur(1) * 2.5                       # reicht für genau 2 Aufrufe (Obergrenze)
+    kib = qc.KIBudget(grenze)
+    shot = {"id": "x", "figuren": [], "bild": "test"}
+    ergebnisse = [qc.ki_pruefen(story, shot, b, {}, kib) for _ in range(5)]
+    assert kib.ausgegeben <= grenze
+    assert ergebnisse[-1][0] is None and "Kostenlimit" in ergebnisse[-1][1][0]   # übersprungen → bleibt gesperrt
+    assert len(aufrufe) >= 2
+
+
+def test_ki_fehler_bucht_schlimmsten_fall_und_sperrt(tmp_path, monkeypatch):
+    from illu import qc
+    story, _, _ = _daten()
+    b = tmp_path / "s.png"
+    Image.new("RGB", (1080, 1920)).save(b)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "x")
+
+    def kaputt(*a, **k):
+        raise TimeoutError("weg")
+    monkeypatch.setattr(qc.urllib.request, "urlopen", kaputt)
+    kib = qc.KIBudget(1.0)
+    ok, gruende = qc.ki_pruefen(story, {"id": "x", "figuren": []}, b, {}, kib)
+    assert ok is None and abs(kib.ausgegeben - qc.ki_obergrenze_eur(1)) < 1e-9
+
+
+def test_freigabe_an_datei_gebunden_und_fehler_nur_mit_absicht(tmp_path, monkeypatch):
+    import pytest
+    from illu import qc
+    from illu.__main__ import main
+    monkeypatch.setattr(plan, "ARCHIV", tmp_path)
+    (tmp_path / SLUG).mkdir()
+    b = tmp_path / SLUG / "ref_jonas_abc.png"
+    Image.new("RGB", (1080, 1920), (1, 2, 3)).save(b)
+    qc.setzen(SLUG, b, "fehler", ["Kind statt Erwachsener"], "ki")
+    with pytest.raises(SystemExit, match="trotz-fehler"):
+        main(["urteil", SLUG, b.name, "ok", "--wer", "Test", "--grund", "passt"])
+    with pytest.raises(SystemExit):
+        main(["urteil", SLUG, b.name, "ok", "--wer", "Test"])                   # Begründung fehlt
+    main(["urteil", SLUG, b.name, "ok", "--wer", "Test", "--grund", "neu bewertet", "--trotz-fehler"])
+    e = qc.status(SLUG, b)
+    assert e["status"] == "manuell_ok" and [v["status"] for v in e["verlauf"]] == ["fehler", "manuell_ok"]
+    Image.new("RGB", (1080, 1920), (9, 9, 9)).save(b)                            # Datei ausgetauscht
+    assert qc.status(SLUG, b)["status"] == "ungeprueft"
+
+
+def test_referenz_freigabe_prueft_tag_und_status(tmp_path, monkeypatch):
+    import pytest
+    from illu import qc
+    from illu import __main__ as m
+    monkeypatch.setattr(plan, "ARCHIV", tmp_path)
+    monkeypatch.setattr(m, "ROOT", tmp_path)
+    (tmp_path / SLUG).mkdir()
+    (tmp_path / "stories" / SLUG).mkdir(parents=True)
+    b = tmp_path / SLUG / "ref_jonas_abc.png"
+    Image.new("RGB", (1080, 1920)).save(b)
+    with pytest.raises(SystemExit, match="ungeprueft"):
+        m.main(["referenz", SLUG, "jonas", b.name])
+    qc.setzen(SLUG, b, "ok", [], "ki")
+    with pytest.raises(SystemExit, match="kein Referenzbild"):
+        m.main(["referenz", SLUG, "grell", b.name])
+    m.main(["referenz", SLUG, "jonas", b.name])
+    assert "jonas: ref_jonas_abc.png" in (tmp_path / "stories" / SLUG / "referenzen.yaml").read_text()

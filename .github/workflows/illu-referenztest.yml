@@ -1,0 +1,86 @@
+# Weg 1 – Bildtest 2, Phase 1: NUR die vier Referenzbilder (Jonas, Aylin, Grell, Backstube) inkl. KI-Prüfung.
+# KOSTENPFLICHTIG (≤ 0,46 €). Startet ausschließlich manuell und erst nach ausdrücklicher Freigabe im Chat.
+# Harte Grenzen: MAX_EUR ist fest eingetragen (Runway + KI-Prüfung zusammen), Freigabephrase Pflicht,
+# Schalter werden nur in der Arbeitskopie des Runners gesetzt (im Repo bleibt alles gesperrt).
+# Erzeugte Bilder werden archiviert – ein erneuter Start kostet 0 €, weil vorhandene Dateien nie neu bezahlt werden.
+name: Bildtest Weg 1 – Referenzen (kostenpflichtig, nur nach Freigabe)
+
+on:
+  workflow_dispatch:
+    inputs:
+      bestaetigung:
+        description: "Freigabephrase aus config/budget.yaml"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: produktion
+  cancel-in-progress: false
+
+env:
+  MAX_EUR: "0.46"
+
+jobs:
+  referenzen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Werkzeuge
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q -r requirements.txt
+          bash scripts/storyhouse_holen.sh
+          git config user.name "csu-bot"; git config user.email "csu-bot@users.noreply.github.com"
+      - name: Kostenvoranschlag (kostenlos)
+        run: python -m illu pruefen die-letzten-10000 1
+      - name: Freigabe nur für diesen Lauf (nicht committet)
+        run: |
+          sed -i 's/^aktiv: false/aktiv: true/' config/illustration.yaml
+          sed -i 's/^paid_rendering_enabled: false/paid_rendering_enabled: true/' config/budget.yaml
+          git update-index --assume-unchanged config/illustration.yaml config/budget.yaml
+      - name: "Referenzbilder erzeugen und prüfen (max. 0,46 €)"
+        env:
+          RUNWAYML_API_SECRET: ${{ secrets.RUNWAYML_API_SECRET }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}   # nur Client-Aufbau, 0 Credits
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}     # KI-Bildprüfung, im Limit enthalten
+          CSU_GIT_SYNC: "1"
+          BEST: ${{ inputs.bestaetigung }}
+        run: |
+          python -m illu bilder die-letzten-10000 1 --out ausgabe/referenztest --nur s15,s21 --nur-referenzen \
+            --max-eur "$MAX_EUR" --bestaetigung "$BEST"
+      - name: Archiv sichern (nie doppelt bezahlen)
+        if: always()
+        run: |
+          git add state; git add assets/illu 2>/dev/null || true
+          git diff --cached --quiet || (git commit -q -m "Bildtest 2 (Referenzen): Bilder, QC und Kasse" && git push -q) || true
+      - name: Prüfbögen und Release (direkte Downloads)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          from PIL import Image, ImageDraw
+          from csu.common import load_story
+          from illu import plan, qc
+          from illu.storyboard import laden
+          story, sb = load_story("die-letzten-10000"), laden("die-letzten-10000", 1)
+          refs = [a for a in plan.auftraege(story, sb) if a.id.startswith("REF_") and not a.fest and a.datei.exists()]
+          bogen = Image.new("RGB", (420 * max(1, len(refs)), 800), "white")
+          for i, a in enumerate(refs):
+              bogen.paste(Image.open(a.datei).convert("RGB").resize((420, 747)), (i * 420, 53))
+              s = qc.status("die-letzten-10000", a.datei)
+              ImageDraw.Draw(bogen).text((i * 420 + 6, 6), f"{a.id[4:]}: {s['status']}", fill="black")
+          Path("ausgabe/referenztest").mkdir(parents=True, exist_ok=True)
+          bogen.save("ausgabe/referenztest/referenzen_uebersicht.jpg", quality=90)
+          EOF
+          TAG="referenztest-$(date +%Y%m%d-%H%M)"
+          ls assets/illu/die-letzten-10000/ref_*_*.png >/dev/null 2>&1 || exit 0
+          gh release create "$TAG" ausgabe/referenztest/referenzen_uebersicht.jpg assets/illu/die-letzten-10000/ref_*_*.png \
+            assets/illu/die-letzten-10000/qc.json --prerelease --title "Bildtest 2 – Referenzen" \
+            --notes "Phase 1: vier Referenzbilder mit KI-Prüfung. Kosten siehe Kasse (state/kosten.json)."
+          echo "### https://github.com/${{ github.repository }}/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"

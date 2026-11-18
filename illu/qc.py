@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import base64
 import datetime as dt
+import hashlib
 import io
 import json
 import os
@@ -37,27 +38,37 @@ def _pfad(slug: str) -> Path:
     return bplan.ARCHIV / slug / "qc.json"
 
 
+def sha256(datei: Path) -> str:
+    return hashlib.sha256(Path(datei).read_bytes()).hexdigest()
+
+
 def laden(slug: str) -> dict:
     p = _pfad(slug)
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
 def setzen(slug: str, datei: Path, status: str, gruende: list[str], quelle: str) -> None:
+    """Jedes Urteil wird an die exakte Datei (SHA-256) gebunden und im Verlauf protokolliert – nie überschrieben."""
+    datei = Path(datei)
     d = laden(slug)
-    d[Path(datei).name] = {"status": status, "gruende": gruende, "quelle": quelle,
-                           "zeit": dt.datetime.now().isoformat(timespec="seconds")}
+    alt = d.get(datei.name) or {}
+    eintrag = {"status": status, "gruende": gruende, "quelle": quelle,
+               "zeit": dt.datetime.now().isoformat(timespec="seconds"), "sha256": sha256(datei)}
+    eintrag["verlauf"] = (alt.get("verlauf") or []) + [{k: eintrag[k] for k in ("status", "gruende", "quelle", "zeit")}]
+    d[datei.name] = eintrag
     p = _pfad(slug)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def status(slug: str, datei: Path) -> dict:
-    d = laden(slug)
     datei = Path(datei)
-    eintrag = d.get(datei.name)
-    if eintrag is None and datei.name.endswith(".ret.png"):        # Retusche erbt nichts automatisch
-        return {"status": "ungeprueft", "gruende": ["Retusche noch nicht geprüft"]}
-    return eintrag or {"status": "ungeprueft", "gruende": []}
+    eintrag = laden(slug).get(datei.name)
+    if not eintrag:
+        return {"status": "ungeprueft", "gruende": []}
+    if not datei.exists() or eintrag.get("sha256") != sha256(datei):
+        return {"status": "ungeprueft", "gruende": ["Datei seit dem Urteil verändert oder ohne Prüfsumme"]}
+    return eintrag
 
 
 def sperren_fehlende(story: dict, sb: dict, bilder: dict[str, Path]) -> list[str]:
@@ -128,18 +139,58 @@ def _b64(p: Path, kante: int = 768) -> str:
     return base64.b64encode(buf.getvalue()).decode()
 
 
-def ki_kosten_eur(anzahl_bilder: int) -> float:
+KI_MAX_OUT = 600          # Antwort-Tokens je Aufruf (hart, max_tokens)
+KI_TEXT_IN = 2500         # Obergrenze Text-Tokens je Aufruf
+KI_BILD_IN = 1600         # Obergrenze je Bild (auf 768 px verkleinert ≈ 450 Tokens – großzügig gerechnet)
+
+
+def _preise() -> tuple[float, float, float]:
     b = yaml.safe_load((ROOT / "config" / "budget.yaml").read_text(encoding="utf-8"))
     a = b["anthropic"]
-    usd = anzahl_bilder * (6000 / 1e6 * a["usd_input_mtok"] + 600 / 1e6 * a["usd_output_mtok"])
-    return round(usd * float(b["eur_per_usd"]) * (1 + float(b["vat_rate"])), 3)
+    f = float(b["eur_per_usd"]) * (1 + float(b["vat_rate"]))
+    return float(a["usd_input_mtok"]) * f / 1e6, float(a["usd_output_mtok"]) * f / 1e6, f
 
 
-def ki_pruefen(story: dict, shot: dict, datei: Path, refs: dict[str, Path]) -> tuple[bool, list[str], dict]:
-    """EIN Aufruf je Shot. Nur aus dem freigegebenen Bilder-Lauf aufrufen (Kasse reserviert vorher)."""
+def ki_obergrenze_eur(bilder_im_aufruf: int) -> float:
+    """Höchstmögliche Kosten EINES Prüfaufrufs (Eingabe gedeckelt durch Bildgröße/Text, Ausgabe durch max_tokens)."""
+    pin, pout, _ = _preise()
+    return round((KI_TEXT_IN + bilder_im_aufruf * KI_BILD_IN) * pin + KI_MAX_OUT * pout, 4)
+
+
+def ki_kosten_eur(anzahl_bilder: int, refs_je_bild: int = 2) -> float:
+    return round(anzahl_bilder * ki_obergrenze_eur(1 + refs_je_bild), 3)
+
+
+class KIBudget:
+    """Harte Grenze für die KI-Bildprüfung: vor jedem Aufruf wird die Obergrenze vorgemerkt; reicht sie nicht,
+    wird NICHT geprüft (Bild bleibt gesperrt). Nach dem Aufruf zählen die echten Tokens; bei Fehlern die Obergrenze."""
+
+    def __init__(self, limit_eur: float):
+        self.limit, self.ausgegeben, self.tokens_in, self.tokens_out = max(0.0, float(limit_eur)), 0.0, 0, 0
+
+    def reicht(self, bilder_im_aufruf: int) -> bool:
+        return self.ausgegeben + ki_obergrenze_eur(bilder_im_aufruf) <= self.limit + 1e-9
+
+    def buchen(self, usage: dict | None, bilder_im_aufruf: int) -> None:
+        pin, pout, _ = _preise()
+        if usage and "input_tokens" in usage:
+            ti, to = int(usage.get("input_tokens", 0)), int(usage.get("output_tokens", 0))
+            self.tokens_in, self.tokens_out = self.tokens_in + ti, self.tokens_out + to
+            self.ausgegeben += ti * pin + to * pout
+        else:                                   # Ausgang unklar → schlimmster Fall
+            self.ausgegeben += ki_obergrenze_eur(bilder_im_aufruf)
+
+
+def ki_pruefen(story: dict, shot: dict, datei: Path, refs: dict[str, Path],
+               budget: KIBudget) -> tuple[bool | None, list[str]]:
+    """EIN Aufruf je Bild – nur wenn das KI-Budget die Obergrenze des Aufrufs noch deckt.
+    Rückgabe ok=True/False (geprüft) oder None (nicht geprüft → Bild bleibt gesperrt)."""
     key = os.environ.get("ANTHROPIC_API_KEY")
     if not key:
-        raise RuntimeError("ANTHROPIC_API_KEY fehlt")
+        return None, ["KI-Prüfung nicht möglich (kein Schlüssel) – manuelles Urteil nötig"]
+    n_bilder = 1 + sum(1 for f in shot.get("figuren") or [] if f in refs)
+    if not budget.reicht(n_bilder):
+        return None, ["KI-Prüfung übersprungen: freigegebenes Kostenlimit erreicht – manuelles Urteil nötig"]
     b = yaml.safe_load((ROOT / "config" / "budget.yaml").read_text(encoding="utf-8"))["anthropic"]
     figs = shot.get("figuren") or []
     inhalt: list[dict] = [{"type": "text", "text": f"Bild 1 = Shot {shot['id']}."}, _bild(datei)]
@@ -159,18 +210,23 @@ def ki_pruefen(story: dict, shot: dict, datei: Path, refs: dict[str, Path]) -> t
         "keine_gesichter_auf_essen; keine_fremden_figuren = keine zusätzlichen Personen/Tiere; stil_2d = flacher "
         "2D-Cartoon mit Konturen, kein 3D-Render. Antworte NUR mit JSON nach diesem Schema: "
         + json.dumps(schema, ensure_ascii=False))})
-    body = {"model": b["modell"], "max_tokens": 600, "messages": [{"role": "user", "content": inhalt}]}
+    body = {"model": b["modell"], "max_tokens": KI_MAX_OUT, "messages": [{"role": "user", "content": inhalt}]}
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=json.dumps(body).encode(),
                                  headers={"x-api-key": key, "anthropic-version": "2023-06-01",
                                           "content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        data = json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            data = json.loads(r.read())
+    except Exception as exc:                    # keine Wiederholung; Kosten im schlimmsten Fall verbucht
+        budget.buchen(None, n_bilder)
+        return None, [f"KI-Prüfung fehlgeschlagen ({type(exc).__name__}) – manuelles Urteil nötig"]
+    budget.buchen(data.get("usage"), n_bilder)
     raw = "".join(x.get("text", "") for x in data.get("content", []))
     try:
         res = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
     except json.JSONDecodeError:
-        return False, ["KI-Antwort nicht lesbar"], data.get("usage", {})
-    return (*auswerten(res, figs), data.get("usage", {}))
+        return None, ["KI-Antwort nicht lesbar – manuelles Urteil nötig"]
+    return auswerten(res, figs)
 
 
 def _bild(p: Path) -> dict:

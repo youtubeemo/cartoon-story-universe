@@ -1,3 +1,3 @@
 # Freigegebene Referenzbilder (Weg 1). Nur hier eingetragene Referenzen dürfen in Shot-Bildern verwendet werden.
-# Eintragen erst nach bestandener Qualitätskontrolle (python -m illu qc / urteil).
-strasse: ref_strasse.ret.png      # Bildtest 18.11.2026, Fantasieschrift lokal entfernt (illu/retusche.py)
+# Eintragen nur über `python -m illu referenz SLUG TAG DATEI` (prüft Dateiname, QC-Status und Prüfsumme).
+strasse: ref_strasse.ret.png      # manuell_ok · manuell (Claude, Sichtprüfung 18.11.2026) · 2026-11-18T13:39:38 · sha256 6f396b8b4dfb

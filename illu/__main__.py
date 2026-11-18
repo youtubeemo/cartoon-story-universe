@@ -7,7 +7,8 @@
     python -m illu folge   SLUG TEIL --out DIR [--stimmen elevenlabs --credit-grenze N]
                                                      # Schnitt nur aus QC-freigegebenen Bildern (ElevenLabs im Abo)
     python -m illu qc      SLUG TEIL --out DIR       # lokale Prüfung + Prüfbögen (kostenlos)
-    python -m illu urteil  SLUG DATEI ok|fehler|vorbehalt --grund "…"   # manuelles Urteil (protokolliert)
+    python -m illu urteil  SLUG DATEI ok|fehler|vorbehalt --wer NAME --grund "…" [--trotz-fehler]
+    python -m illu referenz SLUG TAG DATEI           # geprüfte Referenz freigeben (referenzen.yaml)
     python -m illu retusche SLUG                     # kostenlose Retusche nach stories/SLUG/retusche.yaml
 
 Bilder entstehen in zwei Phasen: erst Referenzen (--nur-referenzen), dann – nach QC und Eintrag in
@@ -136,12 +137,42 @@ def cmd_qc(a) -> int:
 
 
 def cmd_urteil(a) -> int:
+    """Manuelles Urteil: Name und Begründung Pflicht; ein Bild mit Status „fehler“ kann nur mit --trotz-fehler
+    freigegeben werden. Jedes Urteil ist an die Prüfsumme der Datei gebunden und bleibt im Verlauf erhalten."""
     p = bplan.ARCHIV / a.slug / a.datei
     if not p.exists():
         raise SystemExit(f"{p} fehlt")
-    qc.setzen(a.slug, p, {"ok": "manuell_ok"}.get(a.urteil, a.urteil), [a.grund] if a.grund else [],
-              f"manuell ({a.wer})")
-    print(p.name, "→", qc.status(a.slug, p))
+    if not a.wer.strip() or not a.grund.strip():
+        raise SystemExit("⛔ --wer und --grund sind Pflicht (Nachvollziehbarkeit)")
+    vorher = qc.status(a.slug, p)["status"]
+    if a.urteil == "ok" and vorher == "fehler" and not a.trotz_fehler:
+        raise SystemExit(f"⛔ {p.name} hat Status „fehler“ ({'; '.join(qc.status(a.slug, p)['gruende'])}). "
+                         "Freigabe nur mit --trotz-fehler und Begründung.")
+    qc.setzen(a.slug, p, {"ok": "manuell_ok"}.get(a.urteil, a.urteil), [a.grund],
+              f"manuell ({a.wer}{', trotz vorherigem Fehler' if a.trotz_fehler else ''})")
+    print(p.name, vorher, "→", qc.status(a.slug, p)["status"])
+    return 0
+
+
+def cmd_referenz(a) -> int:
+    """Trägt eine Referenz in stories/SLUG/referenzen.yaml ein – nur wenn Datei, Tag und QC-Status passen."""
+    p = bplan.ARCHIV / a.slug / a.datei
+    st = stil()
+    if not p.exists():
+        raise SystemExit(f"⛔ {p} fehlt")
+    erlaubt = a.datei.startswith(f"ref_{a.tag}") or (a.tag == st["stil_anker_tag"] and a.datei.startswith("stil_anker"))
+    if not erlaubt:
+        raise SystemExit(f"⛔ {a.datei} ist kein Referenzbild für „{a.tag}“ (erwartet ref_{a.tag}…)")
+    s = qc.status(a.slug, p)
+    if s["status"] not in qc.OK:
+        raise SystemExit(f"⛔ {a.datei}: QC-Status „{s['status']}“ – erst prüfen/urteilen")
+    ziel = ROOT / "stories" / a.slug / "referenzen.yaml"
+    zeilen = [z for z in (ziel.read_text(encoding="utf-8").splitlines() if ziel.exists() else [])
+              if not z.startswith(f"{a.tag}:")]
+    zeilen.append(f"{a.tag}: {a.datei}      # {s['status']} · {s.get('quelle', '')} · {s.get('zeit', '')} · "
+                  f"sha256 {s['sha256'][:12]}")
+    ziel.write_text("\n".join(zeilen) + "\n", encoding="utf-8")
+    print(f"✓ {a.tag} → {a.datei}")
     return 0
 
 
@@ -217,7 +248,13 @@ def cmd_bilder(a) -> int:
         wahl = {f"IMG_{x.strip()}" for x in a.nur.split(",")}
         if not wahl <= {x.id for x in auftr}:
             raise SystemExit(f"Unbekannte Shots in --nur: {a.nur}")
-        noetig = {r for x in auftr if x.id in wahl for r in x.refs}
+        by = {x.id: x for x in auftr}
+        noetig, offen = set(), [r for x in auftr if x.id in wahl for r in x.refs]
+        while offen:                                    # transitiv: Referenzen brauchen ggf. den Stilanker
+            r = offen.pop()
+            if r not in noetig:
+                noetig.add(r)
+                offen += by[r].refs
         auftr = [x for x in auftr if x.id in wahl or x.id in noetig]
     if a.nur_referenzen:
         auftr = [x for x in auftr if x.id.startswith("REF_")]
@@ -247,7 +284,8 @@ def cmd_bilder(a) -> int:
         print("Alle Bilder liegen schon im Archiv – 0 €.")
         return 0
     ki = bool(st["qc"]["ki_pruefung"]) and bool(os.environ.get("ANTHROPIC_API_KEY"))
-    ki_eur = qc.ki_kosten_eur(len(p.jobs)) if ki else 0.0
+    ki_eur = sum(qc.ki_obergrenze_eur(1 + sum(1 for r in j.payload.get("referenceImages", [])
+                                              if r["tag"] in story["figuren"])) for j in p.jobs) if ki else 0.0
     eur = p.eur(lauf.pricing, lauf.cfg) + ki_eur
     print(f"{len(p.jobs)} Bilder, {p.credits('runway'):.0f} Credits + KI-Prüfung {ki_eur:.2f} € = bis zu {eur:.2f} € "
           f"(Obergrenze {a.max_eur:.2f} €)")
@@ -276,7 +314,8 @@ def cmd_bilder(a) -> int:
     lok = qc.lokal({k: v.datei for k, v in neu.items()})
     refs = _refs_fuer(bplan.auftraege(story, sb, st))
     shots = {s["id"]: s for s in sb["shots"]}
-    usage_in = usage_out = 0
+    # KI darf nur ausgeben, was nach den TATSÄCHLICHEN Runway-Kosten vom freigegebenen Limit übrig ist
+    kib = qc.KIBudget(a.max_eur - lauf.guards[0].spent_eur if ki else 0.0)
     for jid, x in neu.items():
         if lok[jid]:
             qc.setzen(a.slug, x.datei, "fehler", lok[jid], "lokal")
@@ -288,17 +327,19 @@ def cmd_bilder(a) -> int:
             tag = jid[4:]
             shot = {"id": jid, "figuren": [tag] if tag in story["figuren"] else [],
                     "bild": "single character reference sheet" if tag in story["figuren"] else "empty location"}
-            ok, gruende, u = qc.ki_pruefen(story, shot, x.datei, {})
+            ok, gruende = qc.ki_pruefen(story, shot, x.datei, {}, kib)
         else:
-            ok, gruende, u = qc.ki_pruefen(story, shots[jid[4:]], x.datei, refs)
-        usage_in, usage_out = usage_in + u.get("input_tokens", 0), usage_out + u.get("output_tokens", 0)
-        qc.setzen(a.slug, x.datei, "ok" if ok else "fehler", gruende, "ki")
-        print(f"QC {jid}: {'ok' if ok else 'FEHLER – ' + '; '.join(gruende[:3])}")
+            ok, gruende = qc.ki_pruefen(story, shots[jid[4:]], x.datei, refs, kib)
+        stat = "ungeprueft" if ok is None else ("ok" if ok else "fehler")
+        qc.setzen(a.slug, x.datei, stat, gruende, "ki")
+        print(f"QC {jid}: {stat}{' – ' + '; '.join(gruende[:3]) if gruende else ''}")
+    gesamt = lauf.guards[0].spent_eur + kib.ausgegeben
+    print(f"Kosten: Runway {lauf.guards[0].spent_eur:.3f} € + KI-Prüfung {kib.ausgegeben:.3f} € = {gesamt:.3f} € "
+          f"(Limit {a.max_eur:.2f} €)")
     lauf.buchen(f"Weg-1-Bilder {a.slug} {a.teil}", p.credits("runway"), 0)
     if ki:
-        from csu.produktion import _anthropic_eur
-        lauf.kasse.buchen(lauf.run, "anthropic", _anthropic_eur({"input_tokens": usage_in,
-                                                                 "output_tokens": usage_out}), None, "KI-Bildprüfung")
+        lauf.kasse.buchen(lauf.run, "anthropic", kib.ausgegeben, None,
+                          f"KI-Bildprüfung ({kib.tokens_in}/{kib.tokens_out} Tokens)")
     print(f"✓ Bilder unter {bplan.ARCHIV / a.slug} · {lauf.kasse.stand()}")
     return 0
 
@@ -325,13 +366,18 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("slug")
     u.add_argument("datei")
     u.add_argument("urteil", choices=["ok", "fehler", "vorbehalt"])
-    u.add_argument("--grund", default="")
-    u.add_argument("--wer", default="Mensch")
+    u.add_argument("--grund", required=True)
+    u.add_argument("--wer", required=True)
+    u.add_argument("--trotz-fehler", action="store_true")
+    f = sub.add_parser("referenz")
+    f.add_argument("slug")
+    f.add_argument("tag")
+    f.add_argument("datei")
     r = sub.add_parser("retusche")
     r.add_argument("slug")
     a = ap.parse_args(argv)
     return {"pruefen": cmd_pruefen, "muster": cmd_muster, "bilder": cmd_bilder, "folge": cmd_folge, "qc": cmd_qc,
-            "urteil": cmd_urteil, "retusche": cmd_retusche}[a.cmd](a)
+            "urteil": cmd_urteil, "retusche": cmd_retusche, "referenz": cmd_referenz}[a.cmd](a)
 
 
 if __name__ == "__main__":
