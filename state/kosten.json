@@ -2,7 +2,7 @@
   "version": 2,
   "monate": {
     "2026-11": {
-      "gebucht_eur": 5.0078,
+      "gebucht_eur": 5.8694,
       "reservierungen": {},
       "posten": [
         {
@@ -28,6 +28,30 @@
           "eur": 0.0,
           "credits": 3583.0,
           "notiz": "im Abo enthalten"
+        },
+        {
+          "zeit": "2026-11-18T12:59:56+01:00",
+          "run": "44299560525",
+          "anbieter": "nachbuchung",
+          "eur": 0.0,
+          "credits": null,
+          "notiz": "manuell nach Abrechnungskontrolle"
+        },
+        {
+          "zeit": "2026-11-18T13:02:31+01:00",
+          "run": "44299734889",
+          "anbieter": "nachbuchung",
+          "eur": 0.1,
+          "credits": null,
+          "notiz": "manuell nach Abrechnungskontrolle"
+        },
+        {
+          "zeit": "2026-11-18T13:08:40+01:00",
+          "run": "44300248316",
+          "anbieter": "runway",
+          "eur": 0.76,
+          "credits": 64.0,
+          "notiz": "Weg-1-Bilder die-letzten-10000 1"
         }
       ],
       "limit_eur": 150.0
