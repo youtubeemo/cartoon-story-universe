@@ -15,6 +15,16 @@ figuren:
     name: Lukas
     ref_tag: lukas
     beschreibung: "24, Koch, kräftig, blonder Dutt, weiße Kochjacke mit Brandflecken, Pfanne"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "24-year-old stocky cook, blond man bun, short beard, white chef jacket"
+      alter: "24-year-old man"
+      gesicht: "round friendly face, short blond beard, blue eyes, cheerful smile"
+      frisur: "man bun on top of the head"
+      haarfarbe: "blond"
+      haut: "light skin"
+      kleidung: "white chef jacket with small scorch marks, dark grey trousers, black shoes, frying pan"
+      koerper: "stocky, broad shoulders, average height"
+      farben: {haare: "#E2B64A"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: stocky 24-year-old cook, blond man bun,
       short beard, white chef jacket with scorch marks, frying pan in hand, cheerful, plain light background.
@@ -23,6 +33,16 @@ figuren:
     name: Glut
     ref_tag: glut
     beschreibung: "Babydrache, katzengroß, orange Schuppen, winzige Flügel, niest Feuer"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "cat-sized orange baby dragon, big golden eyes, tiny bat wings"
+      alter: "baby dragon"
+      gesicht: "round head, big golden eyes, two tiny horns, small snout with little smoke puffs"
+      frisur: "none"
+      haarfarbe: "none"
+      haut: "bright orange scales, pale yellow belly"
+      kleidung: "none"
+      koerper: "cat-sized, round belly, short legs, tiny bat wings"
+      farben: {schuppen: "#F07A1F"}
     reference_prompt: >
       2D cartoon character model sheet, front and side view: cat-sized baby dragon, bright orange scales,
       tiny bat wings, big golden eyes, round belly, small smoke puff from nostrils, plain light background.
@@ -31,6 +51,16 @@ figuren:
     name: Ritterin Brunhild
     ref_tag: brunhild
     beschreibung: "Stammkundin, riesige Rüstung, Lebensmittelkritikerin des Tals"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "huge woman knight, dented silver armour, red helmet plume, stern face"
+      alter: "about 40-year-old woman knight"
+      gesicht: "square jaw, stern face, visor up"
+      frisur: "short hair visible under the helmet"
+      haarfarbe: "red"
+      haut: "fair skin"
+      kleidung: "dented silver full armour, helmet with a red plume, small notebook"
+      koerper: "huge, very tall and broad"
+      farben: {ruestung: "#B0B6BE", feder: "#C2402B"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: huge armored female knight, dented
       silver armour, red plume on helmet, visor up showing a stern face, holding a notebook, plain light background.

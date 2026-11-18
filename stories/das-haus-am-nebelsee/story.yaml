@@ -15,6 +15,16 @@ figuren:
     name: Ella Funke
     ref_tag: ella
     beschreibung: "28, Detektivin, runde Brille, braune Bob-Frisur, knallgelber Regenmantel, Lupe"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "28-year-old woman, brown bob, round glasses, fair skin, yellow raincoat, red scarf"
+      alter: "28-year-old woman"
+      gesicht: "round face, big round glasses, hazel eyes, curious smirk"
+      frisur: "chin-length bob with straight fringe"
+      haarfarbe: "chestnut brown"
+      haut: "fair skin"
+      kleidung: "bright yellow raincoat, red scarf, dark blue trousers, brown boots, brass magnifying glass"
+      koerper: "average height, slim, adult proportions"
+      farben: {mantel: "#F2C230", schal: "#C2402B"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: clever 28-year-old woman, brown bob
       haircut, big round glasses, bright yellow raincoat, red scarf, holding a brass magnifying glass,
@@ -24,6 +34,16 @@ figuren:
     name: Albert
     ref_tag: albert
     beschreibung: "70, Butler, weißer Backenbart, Frack, Kerzenleuchter"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "70-year-old very tall butler, white mutton-chop sideburns, black tailcoat, white gloves"
+      alter: "70-year-old man"
+      gesicht: "long solemn face, bushy white eyebrows, big white mutton-chop sideburns, clean-shaven chin"
+      frisur: "bald on top, white hair only at the sides"
+      haarfarbe: "white"
+      haut: "fair skin"
+      kleidung: "black tailcoat, white shirt, black bow tie, white gloves, silver candelabra"
+      koerper: "very tall, thin, perfectly upright posture"
+      farben: {frack: "#1F1F26"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: very tall old butler, white mutton-chop
       sideburns, bushy eyebrows, black tailcoat, white gloves, holding a candelabra, solemn face, plain light background.
@@ -32,6 +52,16 @@ figuren:
     name: Viktor von Lindt
     ref_tag: viktor
     beschreibung: "40, Claras Bruder, gegelte Haare, grüner Samtanzug, nervös"
+    merkmale:                  # verbindlich (Weg 1): jedes Bild muss genau so aussehen
+      kurz: "40-year-old slim man, slick black hair, monocle, green velvet suit"
+      alter: "40-year-old man"
+      gesicht: "narrow face, monocle on the right eye, nervous eyes, clean-shaven"
+      frisur: "slick combed-back hair"
+      haarfarbe: "black"
+      haut: "fair skin"
+      kleidung: "green velvet suit, white shirt, monocle on a chain"
+      koerper: "slim, average height"
+      farben: {anzug: "#2E6B4A"}
     reference_prompt: >
       2D cartoon character model sheet, front and three-quarter view: nervous 40-year-old man, slick black
       hair, green velvet suit, monocle, fidgeting hands, plain light background.

@@ -34,6 +34,10 @@ from csu.state import StateError, apply, check_choice_effects, effects_to_events
 
 ROOT = Path(__file__).resolve().parent.parent
 STIL = ROOT / "config" / "illustration.yaml"
+MERKMALE = ("alter", "gesicht", "frisur", "haarfarbe", "haut", "kleidung", "koerper", "kurz")
+# Wörter, die Bildmodelle zu (Fantasie-)Schrift verleiten – Text kommt ausschließlich aus der Pipeline
+SCHRIFT_WOERTER = re.compile(r"\b(text|texts|writing|written|words?|lettering|letters on|logo|logos|label|labels|"
+                             r"caption|numbers?|price tag|headline|sign saying|reads?)\b", re.I)
 SFX = ("papier", "posaune", "kasse", "schritt", "stuhl", "glocke", "tuer", "whoosh", "jubel")
 
 
@@ -104,6 +108,7 @@ def pruefen(story: dict, sb: dict, start: dict, st: dict | None = None) -> list[
     if not shots:
         return f + ["keine Shots"]
     gesehen: dict[str, dict] = {}
+    gesehen_figuren: set[str] = set()
     bilder: dict[str, str] = {}
     for i, s in enumerate(shots):
         sid = s.get("id") or f"#{i + 1}"
@@ -115,6 +120,11 @@ def pruefen(story: dict, sb: dict, start: dict, st: dict | None = None) -> list[
         for fg in figs:
             if fg not in story.get("figuren", {}):
                 f.append(f"{sid}: unbekannte Figur {fg}")
+            elif fg not in gesehen_figuren:
+                fehlt = [k for k in MERKMALE if not (story["figuren"][fg].get("merkmale") or {}).get(k)]
+                if fehlt:
+                    f.append(f"Figur {fg}: Charakterbibel unvollständig (merkmale: {', '.join(fehlt)})")
+                gesehen_figuren.add(fg)
         if len(figs) > st["max_referenzen"] - 1:
             f.append(f"{sid}: höchstens {st['max_referenzen'] - 1} Figuren je Bild (Ort ist die dritte Referenz)")
         if s.get("bild_von"):
@@ -127,6 +137,9 @@ def pruefen(story: dict, sb: dict, start: dict, st: dict | None = None) -> list[
                 f.append(f"{sid}: bild_von zeigt andere Figuren als angegeben")
         else:
             b = " ".join(str(s.get("bild", "")).split())
+            if SCHRIFT_WOERTER.search(b):
+                f.append(f"{sid}: Bildbeschreibung verlangt Schrift ({SCHRIFT_WOERTER.search(b).group(0)!r}) – "
+                         "Text kommt nur als Overlay")
             if len(b.split()) < 6:
                 f.append(f"{sid}: Bildbeschreibung fehlt oder ist zu knapp (mind. 6 Wörter, englisch)")
             elif b.lower() in bilder:

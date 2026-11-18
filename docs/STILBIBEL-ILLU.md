@@ -55,7 +55,65 @@ python -m illu folge   die-letzten-10000 1 --out out/f --stimmen elevenlabs --cr
 paid_rendering_enabled: true` gesetzt sind und die Freigabephrase stimmt. Fertige Bilder liegen in `assets/illu/` und
 werden nie zweimal bezahlt.
 
+## Ausbaustufe 2: Figurentreue und Qualitätskontrolle (nach dem Bildtest vom 18.11.2026)
+
+**Ergebnis des Bildtests (8 Bilder, 0,86 €):** Hintergründe und Farben gut; Referenzblätter plastisch-3D statt 2D;
+Jonas in s15 als Kind mit schwarzen Haaren; Fantasieschrift auf Schildern; Gesichter auf Broten; Grells Hautfarbe
+nicht wie in der Figurenvorlage. Urteile je Bild: `assets/illu/die-letzten-10000/qc.json`.
+
+| Problem | Umsetzung (kostenlos, im Code) |
+|---|---|
+| Figuren uneinheitlich | Verbindliche Charakterbibel `merkmale` für **alle 18 Figuren** in `stories/*/story.yaml`: Alter, Gesicht, Frisur, Haarfarbe, Haut, Kleidung, Körper + Kurzform für Shots; Prüfung verlangt sie vollständig |
+| 3D-Referenzblätter | Gleicher Stiltext für Referenzen und Shots („flat 2D … not 3D, not CGI“); Referenzblatt nur noch **eine** Vorderansicht (die zwei Ansichten wichen voneinander ab); eigener 2D-Stilanker wird beim Erzeugen jeder Referenz als Stilvorlage mitgegeben |
+| Referenzen wirklich genutzt? | Nachweis s. u.; zusätzlich prüft `pruefe_auftraege` vor jedem Lauf: jede Referenz wird als Bild übergeben, ihr Tag erfüllt Runways Regel und steht als `@tag` im Prompt; Prompt ≤ 1000 Zeichen (wird nie still gekürzt) |
+| Jonas falsch | Jede Figur steht mit Kurzbeschreibung im Shot-Prompt („@jonas is Jonas (21-year-old adult man (not a kid), copper-red curly hair …)“) |
+| Schrift, Gesichter auf Essen | Verbotsliste im Prompt; Storyboard-Prüfung lehnt Bildbeschreibungen ab, die Schrift verlangen |
+| Fehlerhafte Bilder | Zwei Phasen: erst Referenzen, dann QC + Eintrag in `stories/<slug>/referenzen.yaml`; Shots nur mit freigegebenen Referenzen. Jedes Bild bekommt einen QC-Status; `folge` verweigert jedes Bild ohne `ok`/`manuell_ok` |
+| Automatische Prüfung | `illu/qc.py`: lokal (Format, Duplikate) + KI-Prüfung je Bild gegen Referenz und Charakterbibel (11 Prüfpunkte, fehlende Antwort = nein) + Prüfbögen für Menschen + protokolliertes manuelles Urteil |
+| Vorhandene Bilder | `illu/retusche.py`: Schrift und Brot-Gesichter lokal entfernt (s21, Straße). Neue Referenz → neuer Dateiname → betroffene Shots werden automatisch neu geplant |
+
+**Nachweis, dass Runway die Referenzbilder verarbeitet hat:** Jonas trägt in s15 und s21 dasselbe kleine
+Buchstaben-Logo auf der Jacke wie auf seinem Referenzblatt – es stand in keinem Prompt. Grell hat in s13/s15
+dieselbe Hautfarbe und Gesichtsform wie sein Referenzblatt, obwohl der Prompt nichts dazu sagte. Die Bilder wurden also
+als Eingabe genutzt; das Problem war die Qualität der Referenzen (zwei widersprüchliche Ansichten, 3D) und die zu
+knappe Figurenbeschreibung im Shot. Laut API-Beschreibung nimmt `gen4_image` höchstens 3 Referenzen; Tags müssen
+3–16 Zeichen lang sein und `^[a-z][a-z0-9_]+$` erfüllen.
+
+**Was lokale Prüfung nicht kann:** Texterkennung (Tesseract) lieferte in den gemalten Bildern fast nur Fehlalarme und
+erkannte „ATAN“ nur als „AX“; Farbanteile unterschieden falschen und richtigen Jonas nicht (Brot und Holz haben
+denselben Farbton wie seine Haare). Beides wird deshalb nicht als Prüfung verwendet; Alter, Gesicht und Proportionen
+prüft nur die KI-Bildprüfung (≈ 0,02 € je Bild) oder ein Mensch.
+
+**Retusche statt Neuerzeugung:** möglich für kleine Störungen (Schrift, Augen auf Brot, Logos) – umgesetzt für s21
+und die Straßenreferenz. Nicht möglich für falsche Figuren (s15), falsche Hautfarbe (s13) oder den 3D-Look der
+Referenzblätter – diese brauchen neue Bilder. Bearbeitungsfähige Bildmodelle (z. B. `gpt_image_2`,
+`nano_banana_2.1`, `ideogram_4_5` mit Maske) sind über dieselbe Runway-Schnittstelle erreichbar, aber
+kostenpflichtig und noch nicht in `config/pricing.yaml` geprüft – deshalb nicht aktiviert.
+
+**Stilvorlage „Schlaf ist Währung“:** Das hochgeladene Video ist das Original des Kanals @ABSURDIAWORLD. Dessen Bilder
+als Referenz in die Bild-KI zu geben hieße, fremde, urheberrechtlich geschützte Grafik als Vorlage zu kopieren –
+das ist rechtlich nicht sauber und wird nicht gemacht. Stattdessen dient ein **eigenes** Bild als Stilanker
+(`assets/illu/die-letzten-10000/stil_anker.png`, retuschierte Straßenreferenz). Wenn du eigene Bilder aus einem
+selbst erstellten Video hast, können sie als Stilanker eingetragen werden.
+
+## Sicherheit der Freigaben
+
+* **Kostenlimit inkl. KI-Prüfung:** Runway bekommt als harte Grenze das Limit minus die Obergrenze der KI-Prüfung.
+  Danach darf die KI nur noch ausgeben, was nach den *tatsächlichen* Runway-Kosten übrig ist (`qc.KIBudget`): vor
+  jedem Aufruf wird dessen höchstmöglicher Preis (Text ≤ 2.500, je Bild ≤ 1.600 Eingabe-Tokens, ≤ 600 Ausgabe-
+  Tokens) vorgemerkt; reicht der Rest nicht, wird nicht geprüft und das Bild bleibt gesperrt. Fehlerhafte Aufrufe
+  werden mit dem Höchstpreis verbucht, nie wiederholt.
+* **Manuelle Urteile:** `--wer` und `--grund` Pflicht; ein Bild mit Status „fehler“ nur mit `--trotz-fehler`.
+  Jedes Urteil ist an die SHA-256-Prüfsumme der Datei gebunden (ausgetauschte Datei → wieder „ungeprüft“) und
+  bleibt im Verlauf erhalten.
+* **Referenzen:** Eintrag in `referenzen.yaml` nur über `python -m illu referenz SLUG TAG DATEI` (Dateiname muss
+  zum Tag passen, QC-Status ok, Prüfsumme wird notiert). Vor jedem Lauf wird der Status jeder festen Referenz erneut
+  geprüft.
+
 ## Offen bis zur Freigabe
 
-* Erster bezahlter Bildtest (6 Referenzblätter + 3 Shots ≈ 72 Credits ≈ 0,86 €) – nur nach ausdrücklicher Freigabe.
-* Danach visuelle Prüfung, ob Figuren über mehrere Shots gleich bleiben; erst dann eine komplette Folge.
+* Workflow „Bildtest Weg 1 – Referenzen“ (`illu-referenztest.yml`): startet nur manuell mit Freigabephrase, fest
+  eingetragenes Limit 0,46 € (vier Referenzen 0,38 € + KI-Prüfung höchstens 0,07 €).
+* Zweiter Bildtest in zwei Phasen: 4 neue Referenzen (Jonas, Aylin, Grell, Backstube) ≈ 0,38 € + KI-Prüfung
+  ≈ 0,08 €; danach 3 Shots ≈ 0,29 € + KI-Prüfung ≈ 0,06 €; zusammen ≈ 0,81 €.
+* Erst danach lässt sich beurteilen, ob 2D-Stil, gleiches Alter und gleiche Gesichtszüge wirklich erreicht werden.
