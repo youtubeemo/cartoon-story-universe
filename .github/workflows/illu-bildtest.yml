@@ -34,7 +34,7 @@ jobs:
           sed -i 's/^aktiv: false/aktiv: true/' config/illustration.yaml
           sed -i 's/^paid_rendering_enabled: false/paid_rendering_enabled: true/' config/budget.yaml
           git update-index --assume-unchanged config/illustration.yaml config/budget.yaml
-      - name: Bilder erzeugen (Rest der Freigabe: 0,86 € − 0,10 € aus Lauf 44299734889)
+      - name: "Bilder erzeugen (Rest der Freigabe 0,765 €; 0,10 € bereits in Lauf 44299734889)"
         env:
           RUNWAYML_API_SECRET: ${{ secrets.RUNWAYML_API_SECRET }}
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}   # nur für den Client-Aufbau, 0 Credits
