@@ -2,16 +2,8 @@
   "version": 2,
   "monate": {
     "2026-11": {
-      "gebucht_eur": 6.0594,
-      "reservierungen": {
-        "44513921338": {
-          "eur": 0.46,
-          "seit": "2026-11-19T12:20:50+01:00",
-          "zweck": [
-            "Weg-1-Bilder die-letzten-10000 1: 0.46 €"
-          ]
-        }
-      },
+      "gebucht_eur": 6.345,
+      "reservierungen": {},
       "posten": [
         {
           "zeit": "2026-11-18T00:52:19+01:00",
@@ -68,6 +60,22 @@
           "eur": 0.19,
           "credits": 16,
           "notiz": "Referenztest: Jonas+Aylin erzeugt (Runway-Task Grell FAILED → 0 Credits laut Client); Bilder wegen .gitignore nicht gesichert"
+        },
+        {
+          "zeit": "2026-11-19T12:23:04+01:00",
+          "run": "44513921338",
+          "anbieter": "runway",
+          "eur": 0.29,
+          "credits": 32.0,
+          "notiz": "Weg-1-Bilder die-letzten-10000 1"
+        },
+        {
+          "zeit": "2026-11-19T12:23:04+01:00",
+          "run": "44513921338",
+          "anbieter": "anthropic",
+          "eur": 0.0,
+          "credits": null,
+          "notiz": "KI-Bildprüfung (0/0 Tokens)"
         }
       ],
       "limit_eur": 150.0

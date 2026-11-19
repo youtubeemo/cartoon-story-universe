@@ -207,5 +207,62 @@
         "zeit": "2026-11-18T13:39:39"
       }
     ]
+  },
+  "ref_aylin_4d518843f8.png": {
+    "status": "fehler",
+    "gruende": [
+      "Format 1088×1920 statt 1080×1920"
+    ],
+    "quelle": "lokal",
+    "zeit": "2026-11-19T11:23:04",
+    "sha256": "e9108d2029150b471fb22e4624bdfb5030326c50985745b70ebef0399065d215",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "Format 1088×1920 statt 1080×1920"
+        ],
+        "quelle": "lokal",
+        "zeit": "2026-11-19T11:23:04"
+      }
+    ]
+  },
+  "ref_grell_7d0d2e5373.png": {
+    "status": "fehler",
+    "gruende": [
+      "Format 1088×1920 statt 1080×1920"
+    ],
+    "quelle": "lokal",
+    "zeit": "2026-11-19T11:23:04",
+    "sha256": "4a8fa22046b0cb930093e8e3a5518a4f791d10ce9a9cbc32c9d20ed742439b61",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "Format 1088×1920 statt 1080×1920"
+        ],
+        "quelle": "lokal",
+        "zeit": "2026-11-19T11:23:04"
+      }
+    ]
+  },
+  "ref_backstube_0ab0a703b1.png": {
+    "status": "fehler",
+    "gruende": [
+      "Format 1088×1920 statt 1080×1920"
+    ],
+    "quelle": "lokal",
+    "zeit": "2026-11-19T11:23:04",
+    "sha256": "e2784d9b4c291723e22df9f5ddc59d368c148cd37b9034ffdc8252a9b8a9225e",
+    "verlauf": [
+      {
+        "status": "fehler",
+        "gruende": [
+          "Format 1088×1920 statt 1080×1920"
+        ],
+        "quelle": "lokal",
+        "zeit": "2026-11-19T11:23:04"
+      }
+    ]
   }
 }
