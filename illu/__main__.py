@@ -228,6 +228,39 @@ def cmd_folge(a) -> int:
     return 0
 
 
+def _einzeln(p, clients, roh: Path, cache: Path, guard) -> dict:
+    """Aufträge einzeln abarbeiten. Meldet Runway einen Task eindeutig als FAILED (abgerechnet laut API: meist
+    0 Credits), werden die übrigen, davon unabhängigen Aufträge trotzdem erledigt – der fehlgeschlagene wird NICHT
+    neu eingereicht. Jeder andere Fehler (unklare Anlage, Limit, Netz) stoppt sofort wie bisher."""
+    import copy
+
+    from csu.render import run_jobs
+    from storyhouse.runway import RunwayError, UncertainSubmissionError
+
+    files: dict = {}
+    fehlgeschlagen: list[str] = []
+    for job in p.jobs:
+        if any(d in fehlgeschlagen for d in job.depends):
+            print(f"↷ {job.id} übersprungen (Referenz fehlgeschlagen)")
+            fehlgeschlagen.append(job.id)
+            continue
+        teil = copy.copy(p)
+        teil.jobs = [job]
+        teil.frozen_refs = {**p.frozen_refs, **{k: str(v) for k, v in files.items()}}
+        try:
+            files.update(run_jobs(teil, clients, roh, cache))
+        except UncertainSubmissionError:
+            raise
+        except RunwayError as exc:
+            if "FAILED" not in str(exc) or guard.stopped:
+                raise
+            print(f"✗ {exc}")
+            fehlgeschlagen.append(job.id)
+    if fehlgeschlagen:
+        print(f"Nicht erzeugt (kein automatischer Neuversuch): {', '.join(fehlgeschlagen)}")
+    return files
+
+
 def cmd_bilder(a) -> int:
     """KOSTENPFLICHTIG. Gleicher Rahmen wie die alte Pipeline: Freigabephrase, Kasse (Reservierung vorab),
     SpendGuard je Aufruf, Guthabenprüfung, keine automatischen Wiederholungen, Archiv statt Doppelzahlung."""
@@ -239,7 +272,6 @@ def cmd_bilder(a) -> int:
         return 1
     from csu.produktion import STOPP, Lauf
     from csu.plan import EpisodePlan
-    from csu.render import run_jobs
     from storyhouse.plan import Job
 
     story, sb = load_story(a.slug), laden(a.slug, a.teil)
@@ -296,7 +328,7 @@ def cmd_bilder(a) -> int:
         lauf.reservieren(a.max_eur, f"Weg-1-Bilder {a.slug} {a.teil}")
         clients = lauf.clients(p.credits("runway"), 0, False, a.max_eur - ki_eur)   # SpendGuard: harte Grenze
         # Zwischenspeicher im Archivordner: wird vom Workflow immer committet → bezahlte Bilder gehen nie verloren
-        files = run_jobs(p, clients, Path(a.out) / "roh", bplan.ARCHIV / a.slug / "cache")
+        files = _einzeln(p, clients, Path(a.out) / "roh", bplan.ARCHIV / a.slug / "cache", lauf.guards[0])
     except STOPP as exc:                    # Abbruch: bereits erzeugte (bezahlte) Bilder trotzdem buchen
         if getattr(lauf, "guards", None) and lauf.guards[0].spent_eur > 0:
             lauf.kasse.buchen(lauf.run, "runway", lauf.guards[0].spent_eur, lauf.guards[0].spent_credits,
