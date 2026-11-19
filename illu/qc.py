@@ -91,8 +91,9 @@ def lokal(bilder: dict[str, Path]) -> dict[str, list[str]]:
         f: list[str] = []
         try:
             with Image.open(p) as im:
-                if im.size != (1080, 1920):
-                    f.append(f"Format {im.size[0]}×{im.size[1]} statt 1080×1920")
+                w, h = im.size                       # Runway liefert z. B. 1088×1920 – 9:16 ±1 %, Höhe ≥ 1920
+                if h < 1920 or abs(w / h - 9 / 16) > 0.01 * 9 / 16:
+                    f.append(f"Format {w}×{h} statt 9:16 mit mindestens 1080×1920")
         except OSError as exc:
             out[sid] = [f"nicht lesbar: {exc}"]
             continue
